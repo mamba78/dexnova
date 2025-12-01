@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import TokensTable from './components/TokensTable';
 import ChainFilter from './components/ChainFilter';
 
@@ -7,8 +8,14 @@ export default function Home() {
       <h1 className="text-6xl font-black text-center mb-12 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
         Hot Pairs • Live Multi-Chain
       </h1>
-      <ChainFilter />
-      <TokensTable />
+      
+      <Suspense fallback={<div className="text-center py-12 text-xl">Loading filters...</div>}>
+        <ChainFilter />
+      </Suspense>
+      
+      <Suspense fallback={<div className="text-center py-32 text-3xl">Loading live tokens...</div>}>
+        <TokensTable />
+      </Suspense>
     </div>
   );
 }
