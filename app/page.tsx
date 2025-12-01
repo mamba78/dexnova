@@ -54,8 +54,8 @@ export default function App() {
       } catch (e) {
         // fallback mock
         setTokens([
-          { address: "EKpQGSJtiSuGXb...", name: "dogwifhat", symbol: "WIF", price: "$3.45", change5m: "+12.4%", change1h: "+28.7%", change6h: "+89.3%", change24h: "+245.1%", volume24h: "$1.2B", liquidity: "$820M", fdv: "$3.4B", logo: "https://assets.coingecko.com/coins/images/34599/large/dogwifhat.jpg", isHot: true },
-          { address: "DezXAZ8z7Pnr...", name: "Bonk", symbol: "BONK", price: "$0.0000342", change5m: "+8.7%", change1h: "+21.3%", change6h: "+67.8%", change24h: "+189.4%", volume24h: "$1.1B", liquidity: "$780M", fdv: "$2.9B", logo: "https://assets.coingecko.com/coins/images/28929/large/bonk.jpg", isHot: true },
+          { address: "EKpQGSJtiSuGXb...", name: "dogwifhat", symbol: "WIF", price: "$3.45", change5m: "+12.4%", change1h: "+28.7%", change6h: "+89.3%", change24h: "+245.1%", volume24h: "$1.2B", liquidity: "$820M", fdv: "$3.4B", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/coins/images/34599/large/dogwifhat.jpg", isHot: true },
+          { address: "DezXAZ8z7Pnr...", name: "Bonk", symbol: "BONK", price: "$0.0000342", change5m: "+8.7%", change1h: "+21.3%", change6h: "+67.8%", change24h: "+189.4%", volume24h: "$1.1B", liquidity: "$780M", fdv: "$2.9B", logo: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/coins/images/28929/large/bonk.jpg", isHot: true },
         ]);
       } finally {
         setLoading(false);
