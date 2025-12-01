@@ -1,11 +1,12 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import SkeletonLoader from './SkeletonLoader';
 
 const networks = ['solana','base','ethereum','bsc','polygon','arbitrum','optimism','zksync_era'];
 
-export default function TokensTable() {
+function TokensTableContent() {
   const searchParams = useSearchParams();
   const selectedChain = searchParams.get('chain') || 'all';
   const [tokens, setTokens] = useState<any[]>([]);
@@ -46,34 +47,46 @@ export default function TokensTable() {
     return () => clearInterval(interval);
   }, [selectedChain]);
 
-  if (loading) return <div className="text-center py-32 text-3xl text-gray-400">Loading live tokens...</div>;
+  if (loading) return <SkeletonLoader />;
 
   return (
     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {tokens.map(t => (
-        <div key={t.id} className="bg-gray-900/60 border border-gray-800 rounded-xl p-6 hover:scale-105 transition-all duration-300 shadow-xl">
+      {tokens.map((t, i) => (
+        <div 
+          key={t.id} 
+          className="token-card fade-in stagger-item"
+          style={{ animationDelay: `${i * 0.05}s` }}
+        >
           <div className="flex items-center gap-4 mb-4">
             <img src={t.logo} alt="" className="w-14 h-14 rounded-full ring-2 ring-gray-700" />
             <div>
-              <h3 className="font-bold text-lg">{t.name}</h3>
-              <p className="text-sm text-gray-400">{t.chain}</p>
+              <h3 className="token-name">{t.name}</h3>
+              <p className="token-symbol">{t.chain}</p>
             </div>
           </div>
-          <div className="text-3xl font-black mb-2">{t.price}</div>
-          <div className={`text-xl font-bold mb-4 ${t.change24h.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
+          <div className="price mb-2">{t.price}</div>
+          <div className={`change mb-4 ${t.change24h.startsWith('+') ? 'change-positive' : 'change-negative'}`}>
             {t.change24h}
           </div>
-          <div className="text-sm text-gray-400 space-y-1">
-            <div>Volume: {t.volume}</div>
-            <div>Liquidity: {t.liquidity}</div>
+          <div className="text-dex-small text-gray-400 space-y-1">
+            <div>Vol: {t.volume}</div>
+            <div>Liq: {t.liquidity}</div>
           </div>
           <Link href={`/token/${t.id}`}>
-            <button className="w-full mt-6 py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold hover:scale-105 transition shadow-lg">
+            <button className="btn-primary w-full mt-6">
               View Token
             </button>
           </Link>
         </div>
       ))}
     </div>
+  );
+}
+
+export default function TokensTable() {
+  return (
+    <Suspense fallback={<SkeletonLoader />}>
+      <TokensTableContent />
+    </Suspense>
   );
 }
