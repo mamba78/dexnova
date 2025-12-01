@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
-import { X, Sparkles, CheckCircle } from 'lucide-react';
-import { BoostManager } from '../lib/boostSystem';
+import { X, Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
+import { verifyBoostPayment } from '../lib/solanaVerify';
 
 interface BoostModalProps {
   token: any;
@@ -15,36 +15,47 @@ export default function BoostModal({ token, onClose, onBoosted }: BoostModalProp
   const [step, setStep] = useState<'select' | 'pay' | 'verify'>('select');
   const [duration, setDuration] = useState<'24h' | '7d' | '30d'>('24h');
   const [txSig, setTxSig] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [error, setError] = useState('');
 
   const handlePay = () => {
-    const link = `https://jup.ag/pay?recipient=BOOST_WALLET&amount=${PRICES[duration]}&token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&label=Boost ${token.name}&message=${duration} on DexNova`;
+    const link = `https://jup.ag/pay?recipient=YOUR_WALLET&amount=${PRICES[duration]}&token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v&label=Boost ${encodeURIComponent(token.name)}&message=${duration}`;
     window.open(link, '_blank');
     setStep('verify');
   };
 
-  const verifyAndBoost = () => {
-    if (BoostManager.verifyPayment(txSig)) {
+  const verifyAndBoost = async () => {
+    if (!txSig.trim()) {
+      setError("Please enter transaction signature");
+      return;
+    }
+
+    setVerifying(true);
+    setError('');
+
+    const success = await verifyBoostPayment(txSig, PRICES[duration]);
+    
+    if (success) {
       const hours = duration === '24h' ? 24 : duration === '7d' ? 168 : 720;
-      BoostManager.add({
-        tokenId: token.id,
-        tokenName: token.name,
-        chain: token.chain,
+      localStorage.setItem(`boosted-${token.id}`, JSON.stringify({
+        expiresAt: Date.now() + hours * 60 * 60 * 1000,
+        boostedAt: Date.now(),
         duration,
         priceUsd: PRICES[duration],
-        paid: true,
         txSignature: txSig,
-        expiresAt: Date.now() + hours * 60 * 60 * 1000,
-      });
+        verified: true
+      }));
       onBoosted();
       onClose();
     } else {
-      alert("Invalid transaction");
+      setError("Payment not found or amount incorrect. Please check signature.");
     }
+    setVerifying(false);
   };
 
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-900 border border-purple-500 rounded-2xl p-8 max-w-md w-full">
+      <div className="bg-gray-900 border border-purple-500 rounded-2xl p-8 max-w-md w-full relative">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
           <X className="w-6 h-6" />
         </button>
@@ -53,9 +64,10 @@ export default function BoostModal({ token, onClose, onBoosted }: BoostModalProp
           <>
             <div className="text-center mb-8">
               <Sparkles className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
-              <h2 className="text-3xl font-black">Boost {token.name}</h2>
+              <h2 className="text-3xl font-black mb-2">Boost Token</h2>
+              <p className="text-xl font-bold text-purple-400">{token.name}</p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-4 mb-8">
               {(['24h', '7d', '30d'] as const).map(d => (
                 <button
                   key={d}
@@ -70,7 +82,7 @@ export default function BoostModal({ token, onClose, onBoosted }: BoostModalProp
                 </button>
               ))}
             </div>
-            <button onClick={handlePay} className="w-full mt-8 py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-xl hover:scale-105 transition">
+            <button onClick={handlePay} className="w-full py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-xl hover:scale-105 transition">
               Pay with Solana Pay
             </button>
           </>
@@ -79,20 +91,30 @@ export default function BoostModal({ token, onClose, onBoosted }: BoostModalProp
         {step === 'verify' && (
           <div className="text-center space-y-6">
             <CheckCircle className="w-20 h-20 mx-auto text-green-500" />
-            <h3 className="text-2xl font-bold">Payment Sent!</h3>
+            <h3 className="text-2xl font-bold">Verify Payment</h3>
+            <p className="text-gray-400">Paste your transaction signature below</p>
+            
             <input
               type="text"
-              placeholder="Paste transaction signature"
+              placeholder="e.g. 5f3...abc"
               value={txSig}
               onChange={e => setTxSig(e.target.value)}
-              className="w-full px-6 py-4 bg-gray-800 rounded-xl text-center"
+              className="w-full px-6 py-4 bg-gray-800 rounded-xl text-center font-mono"
             />
+
+            {error && (
+              <div className="flex items-center gap-3 text-red-400 bg-red-900/20 px-4 py-3 rounded-lg">
+                <AlertCircle className="w-5 h-5" />
+                <span>{error}</span>
+              </div>
+            )}
+
             <button 
               onClick={verifyAndBoost}
-              disabled={!txSig}
+              disabled={verifying || !txSig}
               className="w-full py-5 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-bold text-xl disabled:opacity-50"
             >
-              Verify & Boost
+              {verifying ? 'Verifying...' : 'Confirm & Boost'}
             </button>
           </div>
         )}
