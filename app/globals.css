@@ -2,6 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-black text-white min-h-screen;
+/* DexScreener EXACT font stack + elegant Inter */
+@import url('https://rsms.me/inter/inter.css');
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: normal;
+    line-height: 1.5;
+  }
+}
+
+@layer components {
+  /* DexScreener exact text sizes */
+  .text-dex-h1 { @apply text-5xl md:text-6xl font-black tracking-tight; }
+  .text-dex-h2 { @apply text-3xl md:text-4xl font-bold; }
+  .text-dex-h3 { @apply text-2xl font-bold; }
+  .text-dex-body { @apply text-base md:text-lg leading-relaxed; }
+  .text-dex-small { @apply text-xs md:text-sm; }
+  .text-dex-tiny { @apply text-[11px] leading-none; }
+  
+  /* Token name style */
+  .token-name { @apply font-bold text-lg md:text-xl tracking-tight; }
+  .token-symbol { @apply text-sm text-gray-400 font-medium; }
+  
+  /* Price & change */
+  .price { @apply text-2xl md:text-3xl font-black tracking-tight; }
+  .change-positive { @apply text-green-400 font-bold; }
+  .change-negative { @apply text-red-400 font-bold; }
+  
+  /* Buttons */
+  .btn-primary {
+    @apply px-6 py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-sm hover:scale-105 transition-all duration-200 shadow-lg;
+  }
+}
+
+/* Smooth scrolling & selection */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #6366f1 #1a1a1a;
+}
+
+::selection {
+  background: #a855f7;
+  color: white;
 }
