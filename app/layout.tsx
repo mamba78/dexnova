@@ -1,18 +1,27 @@
-import type { Metadata } from 'next';
 import './globals.css';
-import { Toaster } from 'react-hot-toast';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import CookieBanner from './components/CookieBanner';
 
-export const metadata: Metadata = {
-  title: 'DexNova — The DEX Tracker That Pays YOU',
-  description: 'Real-time Solana & multi-chain meme coin tracker with Jupiter affiliate revenue',
+export const metadata = {
+  title: 'DexNova — The Ultimate Multi-Chain DEX Tracker 2025',
+  description: 'Real-time hot pairs, token details, TradingView charts',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-black text-white">
-        {children}
-        <Toaster position="bottom-right" />
+    <html lang="en">
+      <body className="bg-black text-white min-h-screen">
+        <div className="flex">
+          <Sidebar />
+          <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-1 pt-20">{children}</main>
+            <Footer />
+            <CookieBanner />
+          </div>
+        </div>
       </body>
     </html>
   );
