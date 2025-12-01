@@ -1,31 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Search, ExternalLink, Zap, TrendingUp, Rocket } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Zap, TrendingUp, Rocket, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 
 const SAMPLE_TOKENS = [
   { name: "dogwifhat", symbol: "WIF", price: "$3.45", change: "+245.1%", vol: "$1.28B", age: "11mo", logo: "https://dd.dexscreener.com/ds-data/tokens/solana/EKpQGSJtiSuGXbPCr92R7g5w53C5KdqU4qW6bY9z3Q1t.png" },
   { name: "Bonk", symbol: "BONK", price: "$0.0000342", change: "+189.4%", vol: "$1.1B", age: "2y", logo: "https://dd.dexscreener.com/ds-data/tokens/solana/DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263.png" },
   { name: "Popcat", symbol: "POPCAT", price: "$1.23", change: "+523.7%", vol: "$980M", age: "9mo", logo: "https://dd.dexscreener.com/ds-data/tokens/solana/6q3s8iZwvJ8uQJ8eZ4b8n8x8v8Y8Z8a8b8c8d8e8f8g8.png" },
-  { name: "LOCK IN", symbol: "LOCKIN", price: "$0.156", change: "+890.2%", vol: "$1.8B", age: "3d", logo: "/api/placeholder/60/60" },
-  { name: "michi", symbol: "MICHI", price: "$0.321", change: "+489.1%", vol: "$780M", age: "6mo", logo: "/api/placeholder/60/60" },
-  { name: "Mumu the Bull", symbol: "MUMU", price: "$0.000089", change: "+678.4%", vol: "$1.1B", age: "4mo", logo: "/api/placeholder/60/60" },
-  { name: "Jeo Boden", symbol: "BODEN", price: "$0.42", change: "+210.3%", vol: "$156M", age: "10mo", logo: "/api/placeholder/60/60" },
-  { name: "Gigachad", symbol: "GIGA", price: "$0.089", change: "+367.9%", vol: "$490M", age: "5mo", logo: "/api/placeholder/60/60" },
-  { name: "Pepe", symbol: "PEPE", price: "$0.0000123", change: "+412.8%", vol: "$1.4B", age: "2y", logo: "/api/placeholder/60/60" },
-  { name: "catwifhat", symbol: "MEW", price: "$0.0087", change: "+523.1%", vol: "$980M", age: "11mo", logo: "/api/placeholder/60/60" },
-  // 10 more below — total 20+
-  { name: "Ponke", symbol: "PONKE", price: "$0.456", change: "+278.4%", vol: "$620M", age: "8mo", logo: "/api/placeholder/60/60" },
-  { name: "Billy", symbol: "BILLY", price: "$0.198", change: "+334.7%", vol: "$390M", age: "7mo", logo: "/api/placeholder/60/60" },
-  { name: "Aura", symbol: "AURA", price: "$0.078", change: "+912.3%", vol: "$2.1B", age: "2d", logo: "/api/placeholder/60/60" },
-  { name: "Wen", symbol: "WEN", price: "$0.000298", change: "+198.3%", vol: "$580M", age: "1y", logo: "/api/placeholder/60/60" },
-  { name: "Myro", symbol: "MYRO", price: "$0.28", change: "+378.9%", vol: "$89M", age: "1y", logo: "/api/placeholder/60/60" },
-  { name: "Mog Coin", symbol: "MOG", price: "$0.0000021", change: "+267.4%", vol: "$420M", age: "11mo", logo: "/api/placeholder/60/60" },
-  { name: "Floki", symbol: "FLOKI", price: "$0.000298", change: "+178.9%", vol: "$780M", age: "2y", logo: "/api/placeholder/60/60" },
-  { name: "Samoyed", symbol: "SAMO", price: "$0.0123", change: "+167.9%", vol: "$340M", age: "2y", logo: "/api/placeholder/60/60" },
-  { name: "Zhan", symbol: "ZHAN", price: "$0.044", change: "+445.8%", vol: "$680M", age: "1d", logo: "/api/placeholder/60/60" },
-  { name: "CocaCola", symbol: "COLA", price: "$0.089", change: "+289.1%", vol: "$490M", age: "5d", logo: "/api/placeholder/60/60" },
+  { name: "LOCK IN", symbol: "LOCKIN", price: "$0.156", change: "+890.2%", vol: "$1.8B", age: "3d", logo: "https://via.placeholder.com/60" },
+  { name: "michi", symbol: "MICHI", price: "$0.321", change: "+489.1%", vol: "$780M", age: "6mo", logo: "https://via.placeholder.com/60" },
+  { name: "Mumu the Bull", symbol: "MUMU", price: "$0.000089", change: "+678.4%", vol: "$1.1B", age: "4mo", logo: "https://via.placeholder.com/60" },
+  { name: "Jeo Boden", symbol: "BODEN", price: "$0.42", change: "+210.3%", vol: "$156M", age: "10mo", logo: "https://via.placeholder.com/60" },
+  { name: "Gigachad", symbol: "GIGA", price: "$0.089", change: "+367.9%", vol: "$490M", age: "5mo", logo: "https://via.placeholder.com/60" },
+  { name: "Pepe", symbol: "PEPE", price: "$0.0000123", change: "+412.8%", vol: "$1.4B", age: "2y", logo: "https://via.placeholder.com/60" },
+  { name: "catwifhat", symbol: "MEW", price: "$0.0087", change: "+523.1%", vol: "$980M", age: "11mo", logo: "https://via.placeholder.com/60" },
+  { name: "Ponke", symbol: "PONKE", price: "$0.456", change: "+278.4%", vol: "$620M", age: "8mo", logo: "https://via.placeholder.com/60" },
+  { name: "Billy", symbol: "BILLY", price: "$0.198", change: "+334.7%", vol: "$390M", age: "7mo", logo: "https://via.placeholder.com/60" },
+  { name: "Aura", symbol: "AURA", price: "$0.078", change: "+912.3%", vol: "$2.1B", age: "2d", logo: "https://via.placeholder.com/60" },
+  { name: "Wen", symbol: "WEN", price: "$0.000298", change: "+198.3%", vol: "$580M", age: "1y", logo: "https://via.placeholder.com/60" },
+  { name: "Myro", symbol: "MYRO", price: "$0.28", change: "+378.9%", vol: "$89M", age: "1y", logo: "https://via.placeholder.com/60" },
+  { name: "Mog Coin", symbol: "MOG", price: "$0.0000021", change: "+267.4%", vol: "$420M", age: "11mo", logo: "https://via.placeholder.com/60" },
+  { name: "Floki", symbol: "FLOKI", price: "$0.000298", change: "+178.9%", vol: "$780M", age: "2y", logo: "https://via.placeholder.com/60" },
+  { name: "Samoyed", symbol: "SAMO", price: "$0.0123", change: "+167.9%", vol: "$340M", age: "2y", logo: "https://via.placeholder.com/60" },
+  { name: "Zhan", symbol: "ZHAN", price: "$0.044", change: "+445.8%", vol: "$680M", age: "1d", logo: "https://via.placeholder.com/60" },
+  { name: "CocaCola", symbol: "COLA", price: "$0.089", change: "+289.1%", vol: "$490M", age: "5d", logo: "https://via.placeholder.com/60" },
 ];
 
 export default function Home() {
@@ -33,7 +32,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0d1117] text-white">
-      {/* Top Nitro Bar */}
+      {/* Nitro Bar */}
       <div className="bg-gradient-to-r from-purple-900 via-pink-900 to-cyan-900 py-1 text-center text-sm font-bold">
         NITRO USERS SEE 10× MORE TOKENS • UPGRADE NOW → GET NITRO
       </div>
@@ -50,7 +49,7 @@ export default function Home() {
             </nav>
           </div>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 absolute w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               value={search}
@@ -62,9 +61,9 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content — Three Columns Like DexTools */}
-      <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: New Launches */}
+      {/* Main 3-Column Layout */}
+      <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* New Launches */}
         <div className="space-y-4">
           <h2 className="text-xl font-bold text-cyan-400 flex items-center gap-2">
             <Rocket className="w-5 h-5" /> NEW LAUNCHES
@@ -88,7 +87,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Center: Trending / Pre-Launched */}
+        {/* Trending */}
         <div className="space-y-4">
           <h2 className="text-xl font-bold text-pink-400 flex items-center gap-2">
             <TrendingUp className="w-5 h-5" /> TRENDING RIGHT NOW
@@ -109,17 +108,16 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
           ))}
         </div>
 
-        {/* Right: Gainers + Socials */}
+        {/* Top Gainers + Nitro */}
         <div className="space-y-6">
           <div>
             <h2 className="text-xl font-bold text-yellow-400 flex items-center gap-2">
               <Zap className="w-5 h-5" /> TOP GAINERS 24H
             </h2>
-            {SAMPLE_TOKENS.slice(0, 6).map((t, i) => (
+            {SAMPLE_TOKENS.slice(0, 8).map((t, i) => (
               <div key={i} className="flex items-center justify-between py-2 border-b border-gray-800">
                 <span className="text-sm">{i+1}. ${t.symbol}</span>
                 <span className="text-green-400 font-bold">{t.change}</span>
@@ -127,8 +125,8 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="bg-gray-900/50 rounded-lg p-4 text-center">
-            <p className="text-cyan-400 font-bold mb-3">Want 10× more tokens?</p>
+          <div className="bg-gray-900/50 rounded-lg p-6 text-center">
+            <p className="text-cyan-400 font-bold mb-4">Want 10× more tokens?</p>
             <button className="w-full py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg font-bold hover:scale-105 transition">
               GET NITRO - $29/mo
             </button>
