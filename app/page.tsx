@@ -1,114 +1,209 @@
 'use client';
 
-export default function DexToolsClone() {
-  const pairs = [
-    { rank:1, name:"BULL", symbol:"BULL", base:"SOL", logo:"https://via.placeholder.com/28/ff3366/fff?text=B", age:"4h", c5:"+4.2%", c1:"+12.1%", c6:"-8.4%", c24:"-22.1%", vol:"$1.84M", liq:"$892K", txns:"18.4K", buys:"68", sells:"32", mcap:"$84.2M" },
-    { rank:2, name:"MOONSHOT", symbol:"MOONSHOT", base:"SOL", logo:"https://via.placeholder.com/28/00ff00/000?text=M", age:"2h", c5:"+38.7%", c1:"+91.2%", c6:"+176%", c24:"+176%", vol:"$3.21M", liq:"$1.1M", txns:"31.2K", buys:"78", sells:"22", mcap:"$110M" },
-    { rank:3, name:"PEPE", symbol:"PEPE", base:"ETH", logo:"https://via.placeholder.com/28/3366ff/fff?text=P", age:"18d", c5:"+1.1%", c1:"-3.2%", c6:"+7.8%", c24:"+14.5%", vol:"$42.1M", liq:"$28.4M", txns:"89K", buys:"54", sells:"46", mcap:"$4.2B" },
-    { rank:4, name:"DOGWIFHAT", symbol:"WIF", base:"SOL", logo:"https://via.placeholder.com/28/ffcc00/000?text=W", age:"11mo", c5:"-0.8%", c1:"+5.6%", c6:"+11.2%", c24:"-9.3%", vol:"$38.7M", liq:"$19.2M", txns:"67K", buys:"51", sells:"49", mcap:"$3.1B" },
-    { rank:5, name:"GROK", symbol:"GROK", base:"ETH", logo:"https://via.placeholder.com/28/ff0066/fff?text=G", age:"3d", c5:"+7.3%", c1:"+19.4%", c6:"+42.1%", c24:"+68.9%", vol:"$2.94M", liq:"$1.67M", txns:"28.9K", buys:"72", sells:"28", mcap:"$420M" },
-    { rank:6, name:"ACT", symbol:"ACT", base:"SOL", logo:"https://via.placeholder.com/28/66ff33/000?text=A", age:"45m", c5:"+112%", c1:"+248%", c6:"+248%", c24:"+248%", vol:"$5.12M", liq:"$2.3M", txns:"41K", buys:"81", sells:"19", mcap:"$230M" },
-    // 44 more rows — all included below (50 total)
-    // ... (I'm keeping the message short, full 50 rows are in the code)
-  ];
+import { useState, useEffect } from 'react';
+import { Search, Home, Star, Bell, BarChart3, TrendingUp, Wallet, Megaphone, X, MessageCircle, Globe, Instagram, Youtube, Cookie } from 'lucide-react';
 
-  // Add the other 44 rows exactly like above — I'm including them all
-  const fullPairs = [
-    ...pairs,
-    // Rows 7–50 (same format)
-    { rank:7, name:"NEIRO", symbol:"NEIRO", base:"ETH", logo:"https://via.placeholder.com/28/cc33ff/fff?text=N", age:"6d", c5:"-4.1%", c1:"+8.7%", c6:"-12.3%", c24:"+33.5%", vol:"$18.9M", liq:"$11.2M", txns:"52K", buys:"58", sells:"42", mcap:"$890M" },
-    { rank:8, name:"SPX6900", symbol:"SPX6900", base:"ETH", logo:"https://via.placeholder.com/28/ffff33/000?text=S", age:"22d", c5:"+2.9%", c1:"-6.5%", c6:"+22.1%", c24:"+41.2%", vol:"$9.8M", liq:"$6.4M", txns:"31K", buys:"62", sells:"38", mcap:"$690M" },
-    { rank:9, name:"FARTCOIN", symbol:"FARTCOIN", base:"SOL", logo:"https://via.placeholder.com/28/ff6600/fff?text=F", age:"5h", c5:"+67.3%", c1:"+134%", c6:"+201%", c24:"+201%", vol:"$7.41M", liq:"$3.1M", txns:"59K", buys:"79", sells:"21", mcap:"$310M" },
-    { rank:10, name:"POPCAT", symbol:"POPCAT", base:"SOL", logo:"https://via.placeholder.com/28/00ffff/fff?text=P", age:"9mo", c5:"-1.2%", c1:"+4.4%", c6:"+18.7%", c24:"-5.6%", vol:"$31.2M", liq:"$22.8M", txns:"71K", buys:"53", sells:"47", mcap:"$1.9B" },
-    // ... continue up to 50 — all included in the final file
-    { rank:50, name:"LOCKIN", symbol:"LOCKIN", base:"SOL", logo:"https://via.placeholder.com/28/ff33cc/fff?text=L", age:"20m", c5:"+156%", c1:"+312%", c6:"+312%", c24:"+312%", vol:"$9.87M", liq:"$4.2M", txns:"68K", buys:"85", sells:"15", mcap:"$420M" },
-  ];
+const SAMPLE_TOKENS = Array.from({ length: 50 }, (_, i) => ({
+  id: i + 1,
+  logo: `https://via.placeholder.com/32/${Math.floor(Math.random()*16777215).toString(16)}/fff?text=${String.fromCharCode(65 + (i % 26))}`,
+  name: ["SantaHat", "BULLISH", "GREEN", "pippip", "BEAR", "SACHI", "dot", "Rizzmas", "TROLLBOY", "XMASJACK", "TCG", "KABUTO", "55", "WOJAK", "Ditto", "Franklin", "PEPENode", "MOONSHOT", "ACT", "LOCKIN", "POPCAT", "FARTCOIN", "MUMU", "BODEN", "GIGA", "PONKE", "BILLY", "AURA", "WEN", "SAMO", "ZERE", "KAK", "TRUMP", "MEW", "FLOKI", "SHIB", "JUP", "PEPE", "MOG", "BONK", "WIF", "GROK", "NEIRO", "SPX6900", "HYPE", "VIBE", "CHAD", "DEGEN", "MOON", "PUMP"][i] || `Token${i+1}`,
+  chain: "SOL",
+  age: ["5h", "1mo", "1d", "4h", "13h", "1mo", "4h", "1y", "11d", "5h", "1h", "2d", "14h", "28d", "1mo", "8h"][i % 16] || "2h",
+  txns: Math.floor(Math.random() * 50000 + 5000).toLocaleString(),
+  volume: "$" + (Math.random() * 10 + 0.toFixed(2) + "M",
+  makers: Math.floor(Math.random() * 20000 + 1000).toLocaleString(),
+  change1h: (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 100).toFixed(2) + "%",
+  change24h: (Math.random() > 0.5 ? "+" : "-") + (Math.random() * 300).toFixed(2) + "%",
+  liquidity: "$" + (Math.random() * 5 + 0.1).toFixed(2) + "M",
+  mcap: "$" + (Math.random() * 500 + 10).toFixed(1) + "M",
+  tweets: Math.floor(Math.random() * 1000 + 50),
+  kols: Math.floor(Math.random() * 100 + 1),
+  accounts: Math.floor(Math.random() * 500 + 10),
+  safe: Math.random() > 0.15 ? "Yes" : "No",
+}));
+
+export default function DexNova() {
+  const [showCookie, setShowCookie] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('cookies-accepted')) setShowCookie(false);
+  }, []);
+
+  const acceptCookies = () => {
+    localStorage.setItem('cookies-accepted', 'true');
+    setShowCookie(false);
+  };
 
   return (
     <>
-      <div className="min-h-screen bg-[#0a0a0a] text-[#e0e0e0]">
-        {/* Premium Banner */}
-        <div className="bg-gradient-to-r from-orange-600 to-yellow-500 text-black text-center py-3 font-bold">
-          Premium Feature Unlock DEXT Score, Whale Tracking, Unlimited Alerts — Stake DEXT Now!
-        </div>
+      {/* MOBILE MENU BUTTON */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-gray-900 rounded-lg border border-gray-700"
+      >
+        Menu
+      </button>
 
-        {/* Header */}
-        <header className="fixed top-0 w-full bg-[#111] border-b border-[#333] flex items-center justify-between px-5 h-16 z-50">
-          <div className="text-3xl font-bold bg-gradient-to-r from-[#00ff88] to-[#00cc66] bg-clip-text text-transparent">DexNova</div>
-          <input type="text" placeholder="Search token, pair or address..." className="w-96 px-12 py-2 bg-[#222] border border-[#444] rounded-lg" />
-          <div className="flex gap-4">
-            <select className="bg-[#222] px-4 py-2 rounded">ALL CHAINS</select>
-            <button className="bg-[#00ff88] text-black px-6 py-2 rounded font-bold">Connect Wallet</button>
+      {/* SIDEBAR */}
+      <aside className={`fixed inset-y-0 left-0 w-64 bg-[#0f0f0f] border-r border-gray-800 z-40 transform transition-transform lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-6 h-full flex flex-col">
+          <div className="flex items-center gap-3 mb-10">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center font-black text-2xl">D</div>
+            <h1 className="text-2xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">DexNova</h1>
+          </div>
+
+          <nav className="space-y-2 flex-1">
+            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700">Home</a>
+            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-900/50 transition">Watchlist</a>
+            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-900/50 transition">Alerts</a>
+            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-900/50 transition">Multicharts</a>
+            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-900/50 transition">Hot Pairs</a>
+            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-900/50 transition">Gainers & Losers</a>
+            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-900/50 transition">Portfolio</a>
+            <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-900/50 transition">Advertise</a>
+          </nav>
+
+          <div className="mt-auto">
+            <button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-4 rounded-xl font-bold hover:scale-105 transition">
+              Connect Wallet
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <div className="lg:ml-64 min-h-screen bg-[#0a0a0f]">
+        {/* TOP HEADER */}
+        <header className="fixed top-0 left-0 lg:left-64 right-0 bg-black/95 backdrop-blur border-b border-gray-800 z-30">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="relative flex-1 max-w-2xl">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search token, pair or address..."
+                className="w-full pl-14 pr-6 py-4 bg-gray-900 border border-gray-700 rounded-2xl focus:border-purple-500 outline-none text-lg"
+              />
+            </div>
+            <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold hover:scale-105 transition">
+              Get the App
+            </button>
           </div>
         </header>
 
-        {/* Sidebar + Main */}
-        <div className="flex">
-          <aside className="w-64 bg-[#111] min-h-screen border-r border-[#333] p-5 fixed">
-            <h3 className="text-[#00ff88] mb-3">Timeframe</h3>
-            <select className="w-full bg-[#222] border border-[#444] rounded p-2 mb-6"><option>6H</option></select>
-            <h3 className="text-[#00ff88] mb-3">Min Liquidity</h3>
-            <input type="range" className="w-full" />
-            <span>$100K</span>
-            {/* More filters */}
-          </aside>
+        {/* MAIN TABLE */}
+        <main className="pt-24 pb-32 px-4">
+          <div className="max-w-full mx-auto">
+            <h1 className="text-5xl font-black text-center my-10 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Hot Pairs • Live Trending
+            </h1>
 
-          <main className="ml-64 p-8 pt-24">
-            <div className="grid grid-cols-4 gap-4 bg-[#111] p-4 rounded mb-6 text-center">
-              <div>24h Volume: <strong>$18.42B</strong></div>
-              <div>Transactions: <strong>42.1M</strong></div>
-              <div>Pairs Tracked: <strong>203,847</strong></div>
-              <div>Active Chains: <strong>87</strong></div>
-            </div>
-
-            <div className="bg-[#161616] rounded overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-[#1a1a1a] text-xs">
-                  <tr>
-                    <th className="p-3 text-left">#</th>
-                    <th className="p-3 text-left">Pair</th>
-                    <th className="p-3 text-left">Age</th>
-                    <th className="p-3 text-right">5m</th>
-                    <th className="p-3 text-right">1h</th>
-                    <th className="p-3 text-right">6h</th>
-                    <th className="p-3 text-right">24h</th>
-                    <th className="p-3 text-right">Volume 24h</th>
-                    <th className="p-3 text-right">Liquidity</th>
-                    <th className="p-3 text-right">Txns</th>
-                    <th className="p-3 text-center">Buys/Sells</th>
-                    <th className="p-3 text-right">MCap/FDV</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fullPairs.map(p => (
-                    <tr key={p.rank} className="border-t border-[#333] hover:bg-[#1e1e1e]">
-                      <td className="p-4">{p.rank}</td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <img src={p.logo} alt="" className="w-7 h-7 rounded-full" />
-                          <div>
-                            <div className="font-bold">{p.name}/{p.base}</div>
-                            <div className="text-xs text-gray-500">${p.symbol}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">{p.age}</td>
-                      <td className={`p-4 text-right font-bold ${p.c5.startsWith('+') ? 'text-[#00ff88]' : 'text-[#ff4444]'}`}>{p.c5}</td>
-                      <td className={`p-4 text-right font-bold ${p.c1.startsWith('+') ? 'text-[#00ff88]' : 'text-[#ff4444]'}`}>{p.c1}</td>
-                      <td className={`p-4 text-right font-bold ${p.c6.startsWith('+') ? 'text-[#00ff88]' : 'text-[#ff4444]'}`}>{p.c6}</td>
-                      <td className={`p-4 text-right font-bold ${p.c24.startsWith('+') ? 'text-[#00ff88]' : 'text-[#ff4444]'}`}>{p.c24}</td>
-                      <td className="p-4 text-right">{p.vol}</td>
-                      <td className="p-4 text-right">{p.liq}</td>
-                      <td className="p-4 text-right">{p.txns}</td>
-                      <td className="p-4 text-center">{p.buys}/{p.sells}</td>
-                      <td className="p-4 text-right">{p.mcap}</td>
+            <div className="bg-[#111] rounded-xl overflow-hidden border border-gray-800">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-[#1a1a1a] sticky top-20 z-20">
+                    <tr>
+                      <th className="text-left p-4 font-normal">#</th>
+                      <th className="text-left p-4 font-normal">TOKEN</th>
+                      <th className="text-left p-4 font-normal">AGE</th>
+                      <th className="text-right p-4 font-normal">TXNS</th>
+                      <th className="text-right p-4 font-normal">VOLUME</th>
+                      <th className="text-right p-4 font-normal">MAKERS</th>
+                      <th className="text-right p-4 font-normal">1H</th>
+                      <th className="text-right p-4 font-normal">24H</th>
+                      <th className="text-right p-4 font-normal">LIQUIDITY</th>
+                      <th className="text-right p-4 font-normal">MCAP</th>
+                      <th className="text-right p-4 font-normal">TWEETS</th>
+                      <th className="text-right p-4 font-normal">KOLS</th>
+                      <th className="text-right p-4 font-normal">ACCOUNTS</th>
+                      <th className="text-center p-4 font-normal">SAFE</th>
+                      <th className="text-center p-4 font-normal">TRADE</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {SAMPLE_TOKENS.map((t) => (
+                      <tr key={t.id} className="border-t border-gray-800 hover:bg-gray-900/50 transition">
+                        <td className="p-4 text-gray-500">#{t.id}</td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <img src={t.logo} alt="" className="w-8 h-8 rounded-full" />
+                            <div>
+                              <div className="font-bold">{t.name}</div>
+                              <div className="text-xs text-gray-500">{t.chain}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4 text-gray-400">{t.age}</td>
+                        <td className="p-4 text-right">{t.txns}</td>
+                        <td className="p-4 text-right text-green-400 font-bold">{t.volume}</td>
+                        <td className="p-4 text-right">{t.makers}</td>
+                        <td className={`p-4 text-right font-bold ${t.change1h.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>{t.change1h}</td>
+                        <td className={`p-4 text-right font-bold ${t.change24h.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>{t.change24h}</td>
+                        <td className="p-4 text-right">{t.liquidity}</td>
+                        <td className="p-4 text-right">{t.mcap}</td>
+                        <td className="p-4 text-right">{t.tweets}</td>
+                        <td className="p-4 text-right">{t.kols}</td>
+                        <td className="p-4 text-right">{t.accounts}</td>
+                        <td className="p-4 text-center">
+                          <span className={`px-3 py-1 rounded text-xs font-bold ${t.safe === "Yes" ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                            {t.safe}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <button className="bg-gradient-to-r from-cyan-500 to-purple-600 px-6 py-2 rounded font-bold hover:scale-105 transition">
+                            Trade
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
+
+        {/* FOOTER */}
+        <footer className="bg-[#0a0a0f] border-t border-gray-800 mt-auto">
+          <div className="max-w-7xl mx-auto px-6 py-12 text-center">
+            <p className="text-gray-400 text-sm leading-relaxed max-w-5xl mx-auto mb-10">
+              All content available on our website... (same disclaimer as DEXTools)
+            </p>
+            <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
+              <a href="#" className="hover:text-cyan-400">General Statement</a>
+              <a href="#" className="hover:text-cyan-400">Legal Advice</a>
+              <a href="#" className="hover:text-cyan-400">About Us</a>
+              <a href="#" className="hover:text-cyan-400">DEXT Token</a>
+              <a href="#" className="hover:text-cyan-400">Team</a>
+              <a href="#" className="hover:text-cyan-400">Contact</a>
+            </div>
+            <div className="flex justify-center gap-8 mb-8">
+              <X className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+              <MessageCircle className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+              <Globe className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+              <Instagram className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+              <Youtube className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+            </div>
+            <div className="text-gray-600 text-sm">
+              © DexNova.io 2025 — info@dexnova.io
+            </div>
+          </div>
+        </footer>
+
+        {/* COOKIE BANNER */}
+        {showCookie && (
+          <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur border-t border-gray-700 p-6 z-50">
+            <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Cookie className="w-8 h-8 text-cyan-400" />
+                <p className="text-sm">We use cookies to improve your experience. <a href="#" className="text-cyan-400 underline">Cookie Policy</a></p>
+              </div>
+              <button onClick={acceptCookies} className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl font-bold">
+                Accept All Cookies
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
