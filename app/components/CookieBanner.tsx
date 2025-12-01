@@ -13,9 +13,9 @@ export default function CookieBanner() {
       <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 text-sm">
           <Cookie className="w-6 h-6 text-cyan-400" />
-          <p>We use cookies to improve your experience.</p>
+          <p>We use cookies to enhance your experience.</p>
         </div>
-        <button onClick={() => { localStorage.setItem('cookie-accepted','1'); setShow(false); }} className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg font-bold text-sm">
+        <button onClick={() => { localStorage.setItem('cookie-accepted','1'); setShow(false); }} className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl font-bold">
           Accept
         </button>
       </div>

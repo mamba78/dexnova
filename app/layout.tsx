@@ -4,10 +4,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/CookieBanner';
 
-export const metadata = {
-  title: 'DexNova — Ultimate Multi-Chain Tracker 2025',
-  description: 'Real-time hot pairs, Dune Analytics, boost system',
-};
+export const metadata = { title: 'DexNova — Live Multi-Chain Tracker' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
