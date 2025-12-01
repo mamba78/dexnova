@@ -1,44 +1,36 @@
 'use client';
 import { useState } from 'react';
+import { useTokens } from '../lib/useTokens';
 
-export default function AdminPanel() {
+export default function Admin() {
   const [connected, setConnected] = useState(false);
-  const [wallet, setWallet] = useState('');
+  const { tokens, boostToken } = useTokens();
 
-  const connectWallet = async () => {
-    // @ts-ignore — safe in browser
-    if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
-      try {
-        // @ts-ignore
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        setWallet(accounts[0]);
-        setConnected(true);
-      } catch (e) {
-        alert("Connection failed");
-      }
-    } else {
-      alert("Install MetaMask or Phantom");
-    }
-  };
+  const connect = () => setConnected(true); // Replace with real wallet check
 
   if (!connected) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center p-10 bg-gray-900 rounded-xl border border-gray-700">
-          <h1 className="text-4xl font-black mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Admin Panel</h1>
-          <button onClick={connectWallet} className="px-12 py-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-xl hover:scale-105 transition">
-            Connect Wallet
-          </button>
-        </div>
+        <button onClick={connect} className="px-12 py-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-2xl">
+          Connect Admin Wallet
+        </button>
       </div>
     );
   }
 
   return (
     <div className="p-10">
-      <h1 className="text-5xl font-black mb-10">Admin Panel</h1>
-      <p>Connected: {wallet}</p>
-      {/* Full dashboard coming in next message */}
+      <h1 className="text-5xl font-black mb-10">Admin — Boost Tokens</h1>
+      <div className="grid md:grid-cols-3 gap-6">
+        {tokens.map(t => (
+          <div key={t.id} className="bg-gray-900 p-6 rounded-xl border border-gray-700">
+            <h3 className="font-bold">{t.name}</h3>
+            <button onClick={() => boostToken(t.id)} className={`mt-4 w-full py-3 rounded-xl font-bold ${t.boosted ? 'bg-yellow-600' : 'bg-purple-600'}`}>
+              {t.boosted ? 'Boosted' : 'Boost Token'}
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
