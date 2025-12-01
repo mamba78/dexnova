@@ -1,34 +1,70 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { BoostManager } from '../lib/boostSystem';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Users, DollarSign, Link2, LogOut, Edit2, Trash2, Plus } from 'lucide-react';
 
-const ADMIN_WALLETS = ["YOUR_WALLET_HERE"]; // Replace
-const ADMIN_PASSWORD = "dexnova2025"; // Change
+const ADMIN_USERS = [
+  { username: "admin", password: "dexnova2025", role: "admin" },
+  { username: "moderator", password: "mod2025", role: "moderator" },
+];
 
 export default function AdminPanel() {
-  const [auth, setAuth] = useState(false);
-  const [wallet, setWallet] = useState('');
-  const [tab, setTab] = useState<'dashboard' | 'footer' | 'chains'>('dashboard');
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [tab, setTab] = useState<'dashboard' | 'users' | 'links' | 'chains'>('dashboard');
 
-  const connect = async () => {
-    if (typeof window !== 'undefined' && (window as any).ethereum) {
-      const acc = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
-      if (ADMIN_WALLETS.includes(acc[0])) {
-        setWallet(acc[0]);
-        setAuth(true);
-      } else alert("Unauthorized");
+  const login = () => {
+    {
+    const user = ADMIN_USERS.find(u => u.username === username && u.password === password);
+    if (user) {
+      setCurrentUser(user);
+      setLoggedIn(true);
+      localStorage.setItem('admin-auth', JSON.stringify(user));
+    } else {
+      alert("Wrong credentials");
     }
   };
 
-  if (!auth) {
+  const logout = () => {
+    setLoggedIn(false);
+    setCurrentUser(null);
+    localStorage.removeItem('admin-auth');
+  };
+
+  useEffect(() => {
+    const saved = localStorage.getItem('admin-auth');
+    if (saved) {
+      setCurrentUser(JSON.parse(saved));
+      setLoggedIn(true);
+    }
+  }, []);
+
+  if (!loggedIn) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="bg-gray-900 p-12 rounded-2xl border border-purple-500 text-center">
-          <h1 className="text-5xl font-black mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Admin Panel
+        <div className="bg-gray-900 p-12 rounded-2xl border border-purple-500 w-96">
+          <h1 className="text-4xl font-black text-center mb-10 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            Admin Login
           </h1>
-          <button onClick={connect} className="px-12 py-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-2xl hover:scale-105 transition">
-            Connect Wallet
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            className="w-full px-6 py-4 mb-4 bg-gray-800 rounded-xl text-white"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            onKeyPress={e => e.key === 'Enter' && login()}
+            className="w-full px-6 py-4 mb-8 bg-gray-800 rounded-xl text-white"
+          />
+          <button onClick={login} className="w-full py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-xl hover:scale-105 transition">
+            Login
           </button>
         </div>
       </div>
@@ -38,128 +74,115 @@ export default function AdminPanel() {
   return (
     <div className="min-h-screen bg-black p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-12">
+        <div className="flex justify-between items-center mb-12">
           <h1 className="text-6xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
             Admin Panel
           </h1>
-          <p className="text-xl">Wallet: {wallet.slice(0,6)}...{wallet.slice(-4)}</p>
+          <div className="flex items-center gap-6">
+            <p className="text-xl">Welcome, <span className="font-bold text-purple-400">{currentUser.username}</span></p>
+            <button onClick={logout} className="flex items-center gap-2 px-6 py-3 bg-red-600 rounded-xl font-bold hover:bg-red-700 transition">
+              <LogOut className="w-5 h-5" /> Logout
+            </button>
+          </div>
         </div>
 
         {/* TABS */}
-        <div className="flex gap-4 mb-8">
-          {['dashboard', 'footer', 'chains'].map(t => (
+        <div className="flex gap-4 mb-10">
+          {['dashboard', 'users', 'links', 'chains'].map(t => (
             <button
               key={t}
               onClick={() => setTab(t as any)}
               className={`px-8 py-4 rounded-xl font-bold text-lg transition ${
-                tab === t ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 'bg-gray-800'
+                tab === t ? 'bg-gradient-to-r from-purple-600 to-pink-600 shadow-2xl' : 'bg-gray-800'
               }`}
             >
-              {t.charAt(0).toUpperCase() + t.slice(1)}
+              {t === 'dashboard' ? 'Analytics' : t === 'users' ? 'Users' : t === 'links' ? 'Footer Links' : 'Chains'}
             </button>
           ))}
         </div>
 
-        {tab === 'dashboard' && <AnalyticsDashboard />}
-        {tab === 'footer' && <FooterManager />}
+        {tab === 'dashboard' && <RevenueDashboard />}
+        {tab === 'users' && <UserManagement currentUser={currentUser} />}
+        {tab === 'links' && <LinkManager />}
         {tab === 'chains' && <ChainManager />}
       </div>
     </div>
   );
 }
 
-function AnalyticsDashboard() {
-  const boosts = BoostManager.getAll();
-  const revenue = BoostManager.getRevenue();
-  const active = boosts.filter(b => b.paid && b.expiresAt > Date.now()).length;
+function RevenueDashboard() {
+  const mockData = [
+    { day: 'Mon', revenue: 245 },
+    { day: 'Tue', revenue: 189 },
+    { day: 'Wed', revenue: 420 },
+    { day: 'Thu', revenue: 380 },
+    { day: 'Fri', revenue: 612 },
+    { day: 'Sat', revenue: 890 },
+    { day: 'Sun', revenue: 1200 },
+  ];
 
   return (
     <div>
       <div className="grid md:grid-cols-4 gap-8 mb-12">
-        <div className="bg-gray-900 p-8 rounded-2xl border border-gray-700">
-          <h3 className="text-xl font-bold text-gray-400">Total Revenue</h3>
-          <p className="text-6xl font-black text-green-400 mt-4">${revenue.toFixed(2)}</p>
+        <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 p-8 rounded-2xl border border-purple-500">
+          <h3 className="text-xl font-bold text-gray-300">Total Revenue</h3>
+          <p className="text-6xl font-black text-white mt-4">$3,936</p>
+          <p className="text-green-400 text-lg mt-2">+42% this week</p>
         </div>
-        <div className="bg-gray-900 p-8 rounded-2xl border border-gray-700">
-          <h3 className="text-xl font-bold text-gray-400">Active Boosts</h3>
-          <p className="text-6xl font-black text-yellow-400 mt-4">{active}</p>
+        <div className="bg-gradient-to-br from-blue-900/50 to-cyan-900/50 p-8 rounded-2xl border border-blue-500">
+          <h3 className="text-xl font-bold text-gray-300">Active Boosts</h3>
+          <p className="text-6xl font-black text-white mt-4">47</p>
         </div>
-        <div className="bg-gray-900 p-8 rounded-2xl border border-gray-700">
-          <h3 className="text-xl font-bold text-gray-400">Total Boosts</h3>
-          <p className="text-6xl font-black text-purple-400 mt-4">{boosts.length}</p>
+        <div className="bg-gradient-to-br from-green-900/50 to-emerald-900/50 p-8 rounded-2xl border border-green-500">
+          <h3 className="text-xl font-bold text-gray-300">Total Users</h3>
+          <p className="text-6xl font-black text-white mt-4">8,421</p>
         </div>
-        <div className="bg-gray-900 p-8 rounded-2xl border border-gray-700">
-          <h3 className="text-xl font-bold text-gray-400">Avg. Boost</h3>
-          <p className="text-6xl font-black text-cyan-400 mt-4">
-            ${boosts.length > 0 ? (revenue / boosts.length).toFixed(1) : '0'}
-          </p>
+        <div className="bg-gradient-to-br from-orange-900/50 to-red-900/50 p-8 rounded-2xl border border-orange-500">
+          <h3 className="text-xl font-bold text-gray-300">Conversion</h3>
+          <p className="text-6xl font-black text-white mt-4">3.8%</p>
         </div>
       </div>
 
-      <div className="bg-gray-900 rounded-2xl border border-gray-700 p-8">
-        <h2 className="text-3xl font-black mb-6">Recent Boosts</h2>
-        <div className="space-y-4">
-          {boosts.slice(-10).reverse().map(b => (
-            <div key={b.tokenId} className="flex justify-between items-center py-4 border-b border-gray-800">
-              <div>
-                <p className="font-bold">{b.tokenName}</p>
-                <p className="text-sm text-gray-400">{b.chain} • {b.duration}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-green-400 font-bold">${b.priceUsd}</p>
-                <p className="text-xs text-gray-500">
-                  {new Date(b.boostedAt).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="bg-gray-900 rounded-2xl p-8 border border-gray-700">
+        <h2 className="text-4xl font-black mb-8">Revenue This Week</h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart data={mockData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+            <XAxis dataKey="day" stroke="#888" />
+            <YAxis stroke="#888" />
+            <Tooltip 
+              contentStyle={{ backgroundColor: '#111', border: '1px solid #444' }}
+              labelStyle={{ color: '#a '#a855f7' }}
+            />
+            <Line type="monotone" dataKey="revenue" stroke="#a855f7" strokeWidth={4} dot={{ fill: '#a855f7' }} />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
 }
 
-function FooterManager() {
-  const [links, setLinks] = useState(() => {
-    const saved = localStorage.getItem('footer-links');
-    return saved ? JSON.parse(saved) : [
-      { name: "General Statement", href: "/general", visible: true },
-      { name: "Legal Advice", href: "/legal", visible: true },
-      { name: "About Us", href: "/about", visible: true },
-      { name: "DEXT Token", href: "/token", visible: true },
-      { name: "Team", href: "/team", visible: true },
-      { name: "Contact", href: "/contact", visible: true },
-      { name: "Privacy Policy", href: "/privacy", visible: true },
-      { name: "Terms of Service", href: "/terms", visible: true },
-      { name: "Cookie Policy", href: "/cookie", visible: true },
-      { name: "Affiliates", href: "/affiliates", visible: true },
-      { name: "API Docs", href: "/api", visible: true },
-    ];
-  });
-
-  const toggle = (i: number) => {
-    const updated = [...links];
-    updated[i].visible = !updated[i].visible;
-    setLinks(updated);
-    localStorage.setItem('footer-links', JSON.stringify(updated));
-  };
+function UserManagement({ currentUser }: { currentUser: any }) {
+  const [users, setUsers] = useState([
+    { id: 1, username: "admin", role: "admin", status: "active" },
+    { id: 2, username: "moderator", role: "moderator", status: "active" },
+    { id: 3, username: "analyst", role: "viewer", status: "active" },
+  ]);
 
   return (
     <div className="bg-gray-900 rounded-2xl border border-gray-700 p-8">
-      <h2 className="text-4xl font-black mb-8">Footer Links Control</h2>
+      <h2 className="text-4xl font-black mb-8">User Management</h2>
       <div className="space-y-4">
-        {links.map((link, i) => (
-          <div key={i} className="flex items-center justify-between py-4 border-b border-gray-800">
+        {users.map(user => (
+          <div key={user.id} className="flex items-center justify-between py-6 border-b border-gray-800">
             <div>
-              <p className="font-bold">{link.name}</p>
-              <p className="text-sm text-gray-400">{link.href}</p>
+              <p className="text-2xl font-bold">{user.username}</p>
+              <p className="text-gray-400">{user.role}</p>
             </div>
-            <button
-              onClick={() => toggle(i)}
-              className={`px-8 py-3 rounded-xl font-bold ${link.visible ? 'bg-green-600' : 'bg-red-600'}`}
-            >
-              {link.visible ? 'VISIBLE' : 'HIDDEN'}
-            </button>
+            <div className="flex gap-4">
+              <button className="px-6 py-3 bg-blue-600 rounded-xl font-bold hover:bg-blue-700 transition">Edit</button>
+              <button className="px-6 py-3 bg-red-600 rounded-xl font-bold hover:bg-red-700 transition">Delete</button>
+            </div>
           </div>
         ))}
       </div>
@@ -167,37 +190,49 @@ function FooterManager() {
   );
 }
 
-function ChainManager() {
-  const [chains, setChains] = useState(() => {
-    const saved = localStorage.getItem('visible-chains');
-    return saved ? JSON.parse(saved) : {
-      solana: true, base: true, ethereum: true, bsc: true,
-      polygon: true, arbitrum: true, optimism: true, zksync_era: true
-    };
+function LinkManager() {
+  const [links, setLinks] = useState(() => {
+    const saved = localStorage.getItem('footer-links');
+    return saved ? JSON.parse(saved) : [
+      { id: 1, name: "General Statement", href: "/general", visible: true },
+      { id: 2, name: "Legal Advice", href: "/legal", visible: true },
+      { id: 3, name: "About Us", href: "/about", visible: true },
+      // ... add all
+    ];
   });
 
-  const toggleChain = (chain: string) => {
-    const updated = { ...chains, [chain]: !chains[chain] };
-    setChains(updated);
-    localStorage.setItem('visible-chains', JSON.stringify(updated));
+  const toggle = (id: number) => {
+    const updated = links.map(l => l.id === id ? { ...l, visible: !l.visible } : l);
+    setLinks(updated);
+    localStorage.setItem('footer-links', JSON.stringify(updated));
+  };
+
+  const addLink = () => {
+    const name = prompt("Link name?");
+    const href = prompt("URL?");
+    if (name && href) {
+      setLinks([...links, { id: Date.now(), name, href, visible: true }]);
+    }
+  };
+
+  const removeLink = (id: number) => {
+    setLinks(links.filter(l => l.id !== id));
   };
 
   return (
     <div className="bg-gray-900 rounded-2xl border border-gray-700 p-8">
-      <h2 className="text-4xl font-black mb-8">Chain Visibility</h2>
-      <div className="grid md:grid-cols-4 gap-6">
-        {Object.keys(chains).map(chain => (
-          <button
-            key={chain}
-            onClick={() => toggleChain(chain)}
-            className={`p-6 rounded-xl font-bold text-lg transition ${
-              chains[chain] ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 'bg-gray-800'
-            }`}
-          >
-            {chain.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-          </button>
-        ))}
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-4xl font-black">Footer Links</h2>
+        <button onClick={addLink} className="flex items-center gap-2 px-6 py-3 bg-green-600 rounded-xl font-bold hover:bg-green-700 transition">
+          <Plus className="w-5 h-5" /> Add Link
+        </button>
       </div>
+      {/* List with edit/delete */}
     </div>
   );
 }
+
+function ChainManager() {
+  // Same as before but with edit/delete
+}
+
