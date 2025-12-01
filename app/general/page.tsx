@@ -10,9 +10,10 @@ export default function General() {
           General Statement
         </h1>
         <div className="prose prose-invert text-gray-300 text-lg leading-relaxed space-y-6">
-          <p>DexNova is a decentralized exchange data aggregator that provides real-time information about tokens, liquidity pools, and trading activity across multiple blockchain networks.</p>
-          <p>We do not offer financial advice, investment recommendations, or trading signals. All data displayed is for informational purposes only.</p>
-          <p>Cryptocurrency trading involves substantial risk. You should conduct your own research and consult with qualified financial advisors before making any investment decisions.</p>
+          <p>DexNova is a decentralized exchange (DEX) analytics platform designed to provide real-time data on trading pairs, token prices, liquidity, and market activity across multiple blockchain networks. Our mission is to empower traders with transparent, accurate, and timely information to make informed decisions in the cryptocurrency market.</p>
+          <p>All data displayed on DexNova is sourced from public blockchain explorers and DEX protocols. We do not execute trades, hold funds, or provide financial advice. Users are responsible for verifying all information and conducting their own research (DYOR) before engaging in any trading activities.</p>
+          <p>DexNova operates as a neutral data aggregator and is not affiliated with any specific project, token, or exchange. The platform supports multiple chains including Solana, Ethereum, Base, and others, with ongoing expansions to enhance coverage.</p>
+          <p>For support or inquiries, please visit our <a href="/contact" className="text-purple-400 hover:underline">Contact</a> page.</p>
         </div>
       </main>
       <Footer />

@@ -10,13 +10,15 @@ export default function Cookie() {
           Cookie Policy
         </h1>
         <div className="prose prose-invert text-gray-300 text-lg leading-relaxed space-y-6">
-          <p>We use cookies to:</p>
+          <p><strong>Effective Date:</strong> December 1, 2025</p>
+          <p>DexNova uses cookies to enhance user experience. Cookies are small files stored on your device.</p>
+          <p><strong>Cookie Types:</strong></p>
           <ul className="list-disc pl-8 space-y-2">
-            <li>Remember your preferences</li>
-            <li>Improve site performance</li>
-            <li>Provide analytics</li>
+            <li><strong>Essential:</strong> For site functionality (session management)</li>
+            <li><strong>Analytics:</strong> Google Analytics for usage data (anonymous)</li>
+            <li><strong>Preferences:</strong> Remember language and theme</li>
           </ul>
-          <p>You can disable cookies in your browser settings.</p>
+          <p>You can manage cookies in your browser settings. Disabling essential cookies may break site functionality.</p>
         </div>
       </main>
       <Footer />

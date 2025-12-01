@@ -12,18 +12,21 @@ export default function Team() {
         <div className="grid md:grid-cols-3 gap-12">
           <div className="text-center">
             <div className="w-48 h-48 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mx-auto mb-6" />
-            <h3 className="text-2xl font-bold">0xAlpha</h3>
-            <p className="text-purple-400">Founder & Lead Developer</p>
+            <h3 className="text-2xl font-bold mb-2">Alex Crypto</h3>
+            <p className="text-purple-400 text-lg">Founder & CEO</p>
+            <p className="text-gray-300 text-sm">10+ years in blockchain, built 5 DEXs</p>
           </div>
           <div className="text-center">
             <div className="w-48 h-48 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full mx-auto mb-6" />
-            <h3 className="text-2xl font-bold">ChainMaster</h3>
-            <p className="text-blue-400">Blockchain Architect</p>
+            <h3 className="text-2xl font-bold mb-2">Sarah Dev</h3>
+            <p className="text-blue-400 text-lg">Lead Developer</p>
+            <p className="text-gray-300 text-sm">Full-stack expert, Next.js specialist</p>
           </div>
           <div className="text-center">
             <div className="w-48 h-48 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full mx-auto mb-6" />
-            <h3 className="text-2xl font-bold">DataWizard</h3>
-            <p className="text-green-400">Real-Time Systems</p>
+            <h3 className="text-2xl font-bold mb-2">Mike Analytics</h3>
+            <p className="text-green-400 text-lg">Data Scientist</p>
+            <p className="text-gray-300 text-sm">Real-time data wizard</p>
           </div>
         </div>
       </main>

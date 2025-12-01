@@ -22,7 +22,7 @@ export default function Footer() {
         <div className="text-center text-sm text-gray-500 mb-8">
           All content is for informational purposes only. Trading is high risk.
         </div>
-        <div className="flex flex-wrap justifyляють-center gap-6 mb-10 text-sm">
+        <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm">
           {links.map(link => (
             <Link key={link.name} href={link.href} className="hover:text-cyan-400 transition">
               {link.name}

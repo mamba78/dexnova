@@ -10,9 +10,11 @@ export default function Contact() {
           Contact Us
         </h1>
         <div className="space-y-8 text-xl">
-          <p>Email: <a href="mailto:info@dexnova.io" className="text-purple-400 hover:underline">info@dexnova.io</a></p>
+          <p>Email: <a href="mailto:support@dexnova.io" className="text-purple-400 hover:underline">support@dexnova.io</a></p>
           <p>Twitter: <a href="https://twitter.com/dexnova" className="text-purple-400 hover:underline">@dexnova</a></p>
           <p>Telegram: <a href="https://t.me/dexnova" className="text-purple-400 hover:underline">t.me/dexnova</a></p>
+          <p>Discord: <a href="https://discord.gg/dexnova" className="text-purple-400 hover:underline">discord.gg/dexnova</a></p>
+          <p>Business inquiries: <a href="mailto:partnerships@dexnova.io" className="text-purple-400 hover:underline">partnerships@dexnova.io</a></p>
         </div>
       </main>
       <Footer />

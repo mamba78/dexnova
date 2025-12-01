@@ -11,8 +11,9 @@ export default function Affiliates() {
         </h1>
         <div className="text-2xl text-gray-300 space-y-8">
           <p>Earn 30% lifetime commission on all referrals</p>
-          <p>Just add <code className="bg-gray-900 px-4 py-2 rounded">?ref=yourname</code> to any link</p>
-          <p className="text-4xl font-black text-green-400 mt-12">42.8 SOL earned this month</p>
+          <p>Add <code className="bg-gray-900 px-4 py-2 rounded text-purple-400">?ref=yourname</code> to any DexNova link</p>
+          <p className="text-4xl font-black text-green-400">42.8 SOL earned this month</p>
+          <p>Join our affiliate program by emailing <a href="mailto:affiliates@dexnova.io" className="text-purple-400 hover:underline">affiliates@dexnova.io</a></p>
         </div>
       </main>
       <Footer />

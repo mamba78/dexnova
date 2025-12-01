@@ -10,9 +10,21 @@ export default function Privacy() {
           Privacy Policy
         </h1>
         <div className="prose prose-invert text-gray-300 text-lg leading-relaxed space-y-6">
-          <p>Last updated: December 2025</p>
-          <p>DexNova respects your privacy. We do not collect personal information unless you voluntarily provide it.</p>
-          <p>We use cookies only for essential functionality and analytics. No tracking for advertising.</p>
+          <p><strong>Effective Date:</strong> December 1, 2025</p>
+          <p>DexNova ("we", "us", "our") respects your privacy and is committed to protecting your personal data. This Privacy Policy explains how we collect, use, and disclose your information when you use our website and services.</p>
+          <p><strong>Data We Collect:</strong></p>
+          <ul className="list-disc pl-8 space-y-2">
+            <li>Usage data (IP address, browser type, pages visited)</li>
+            <li>Cookies for session management</li>
+            <li>Wallet addresses for transaction tracking</li>
+          </ul>
+          <p><strong>How We Use Your Data:</strong></p>
+          <ul className="list-disc pl-8 space-y-2">
+            <li>Improve site performance</li>
+            <li>Provide personalized features</li>
+            <li>Analytics and research</li>
+          </ul>
+          <p>We do not sell your data. For questions, email <a href="mailto:privacy@dexnova.io" className="text-purple-400 hover:underline">privacy@dexnova.io</a>.</p>
         </div>
       </main>
       <Footer />
