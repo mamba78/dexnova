@@ -1,13 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Grid3x3, Table, ArrowUpDown, Twitter, Users, UserCheck } from 'lucide-react';
+import { Twitter, Users, UserCheck } from 'lucide-react';
 
 export default function Home() {
   const [tokens, setTokens] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode] = useState<'table'>('table');
-  const [sortField, setSortField] = useState<string>('rank');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
     const fetchLive = async () => {
@@ -17,19 +14,26 @@ export default function Home() {
         const data = JSON.parse(wrapper.contents || '{}');
 
         if (data?.data?.length > 0) {
-          const liveTokens = data.data.slice(0, 50).map((p: any, i: number) => {
+          const liveTokens = data.data.slice(0, 30).map((p: any, i: number) => {
             const a = p.attributes || {};
+            const price = Number(a.base_token_price_usd) || 0;
+            const change1h = Number(a.price_change_percentage?.h1) || 0;
+            const change24h = Number(a.price_change_percentage?.h24) || 0;
+            const volume24h = Number(a.volume_usd?.h24) || 0;
+            const liquidity = Number(a.reserve_in_usd) || 0;
+            const mcap = Number(a.fdv_usd) || 0;
+
             return {
               id: p.id || `token-${i}`,
               rank: i + 1,
-              name: a.name?.split(' / ')[0] || 'Unknown Token',
-              symbol: a.base_token_symbol || '???',
-              price: a.base_token_price_usd ? Number(a.base_token_price_usd) : 0,
-              change1h: a.price_change_percentage?.h1 || 0,
-              change24h: a.price_change_percentage?.h24 || 0,
-              volume24h: a.volume_usd?.h24 || 0,
-              liquidity: a.reserve_in_usd || 0,
-              mcap: a.fdv_usd || 0,
+              name: a.name?.split(' / ')[0] || 'Unknown',
+              symbol: a.base_token_symbol || 'SOL',
+              price,
+              change1h,
+              change24h,
+              volume24h,
+              liquidity,
+              mcap,
               age: Math.random() > 0.6 ? `${Math.floor(Math.random() * 23)}h` : `${Math.floor(Math.random() * 5)}d`,
               txns: Math.floor(Math.random() * 100000) + 10000,
               makers: Math.floor(Math.random() * 5000) + 500,
@@ -50,8 +54,8 @@ export default function Home() {
           name: ['BONK', 'WIF', 'POPCAT', 'PEPE', 'MEW'][i % 5],
           symbol: 'SOL',
           price: Math.random() * 0.01,
-          change1h: (Math.random() * 200 - 100),
-          change24h: (Math.random() * 500 - 100),
+          change1h: Math.random() * 200 - 100,
+          change24h: Math.random() * 500 - 100,
           volume24h: Math.random() * 500000000,
           liquidity: Math.random() * 100000000,
           mcap: Math.random() * 1000000000,
@@ -74,24 +78,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const totalVolume = tokens.reduce((sum, t) => sum + (t.volume24h || 0), 0);
-  const totalTxns = tokens.reduce((sum, t) => sum + (t.txns || 0), 0);
-
-  const sortedTokens = [...tokens].sort((a, b) => {
-    const aVal = a[sortField] || 0;
-    const bVal = b[sortField] || 0;
-    return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
-  });
-
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDir('desc');
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
@@ -107,21 +93,9 @@ export default function Home() {
       {/* TOP BAR */}
       <div className="border-b border-gray-800 bg-black/50 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4 text-lg font-bold">
-          <div>24H VOLUME: ${(totalVolume / 1e9).toFixed(2)}B</div>
-          <div>24H TXNS: {totalTxns.toLocaleString()}</div>
+          <div>24H VOLUME: ${(tokens.reduce((s, t) => s + t.volume24h, 0) / 1e9).toFixed(2)}B</div>
+          <div>24H TXNS: {tokens.reduce((s, t) => s + t.txns, 0).toLocaleString()}</div>
         </div>
-      </div>
-
-      {/* FILTERS */}
-      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-wrap gap-3 justify-center">
-        <button className="px-4 py-2 bg-blue-600 rounded-lg font-bold">X Alpha OFF</button>
-        <button className="px-4 py-2 bg-gray-700 rounded-lg">Last 24 hours</button>
-        <button className="px-4 py-2 bg-purple-600 rounded-lg font-bold">Trending</button>
-        {['5M', '1H', '6H', '24H'].map(t => (
-          <button key={t} className={`px-4 py-2 rounded-lg font-bold ${t === '24H' ? 'bg-purple-600' : 'bg-gray-700'}`}>
-            {t}
-          </button>
-        ))}
       </div>
 
       {/* TABLE */}
@@ -129,14 +103,14 @@ export default function Home() {
         <table className="w-full text-xs lg:text-sm">
           <thead className="bg-[#111118] sticky top-0 z-10 border-b-2 border-gray-700">
             <tr>
-              <th onClick={() => handleSort('rank')} className="text-left p-4 cursor-pointer hover:bg-gray-800">#</th>
+              <th className="text-left p-4">#</th>
               <th className="text-left p-4">Token</th>
               <th className="text-left p-4">Age</th>
-              <th onClick={() => handleSort('txns')} className="text-right p-4 cursor-pointer hover:bg-gray-800">Txns</th>
-              <th onClick={() => handleSort('volume24h')} className="text-right p-4 cursor-pointer hover:bg-gray-800">Volume</th>
+              <th className="text-right p-4">Txns</th>
+              <th className="text-right p-4">Volume</th>
               <th className="text-right p-4">Makers</th>
-              <th onClick={() => handleSort('change1h')} className="text-center p-4 cursor-pointer hover:bg-gray-800">1h</th>
-              <th onClick={() => handleSort('change24h')} className="text-center p-4 cursor-pointer hover:bg-gray-800">24h</th>
+              <th className="text-center p-4">1h</th>
+              <th className="text-center p-4">24h</th>
               <th className="text-right p-4">Liquidity</th>
               <th className="text-right p-4">MCap</th>
               <th className="text-center p-4"><Twitter className="w-4 h-4 mx-auto" /></th>
@@ -147,7 +121,7 @@ export default function Home() {
             </tr>
           </thead>
           <tbody>
-            {sortedTokens.map(t => (
+            {tokens.map(t => (
               <tr key={t.id} className="border-b border-gray-800 hover:bg-gray-900/40 transition">
                 <td className="p-4 text-gray-400">#{t.rank}</td>
                 <td className="p-4">
@@ -160,9 +134,9 @@ export default function Home() {
                   </div>
                 </td>
                 <td className="p-4 text-gray-400">{t.age}</td>
-                <td className="p-4 text-right">{t.txns?.toLocaleString() || '0'}</td>
+                <td className="p-4 text-right">{t.txns.toLocaleString()}</td>
                 <td className="p-4 text-right text-green-400 font-bold">${(t.volume24h / 1000000).toFixed(1)}M</td>
-                <td className="p-4 text-right">{t.makers?.toLocaleString() || '0'}</td>
+                <td className="p-4 text-right">{t.makers.toLocaleString()}</td>
                 <td className={`p-4 text-center font-bold ${t.change1h > 0 ? 'text-green-400' : 'text-red-400'}`}>
                   {t.change1h > 0 ? '+' : ''}{t.change1h.toFixed(1)}%
                 </td>
