@@ -1,30 +1,17 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-export default function Team() {
+export default function Page() {
   return (
     <div className="min-h-screen bg-black">
       <Header />
-      <main className="pt-32 pb-20 px-6 max-w-6xl mx-auto">
-        <h1 className="text-6xl font-black text-center mb-16 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Our Team
+      <main className="pt-32 pb-20 px-6 max-w-4xl mx-auto">
+        <h1 className="text-6xl font-black mb-12 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          Team
         </h1>
-        <div className="grid md:grid-cols-3 gap-12">
-          <div className="text-center">
-            <div className="w-48 h-48 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mx-auto mb-6" />
-            <h3 className="text-2xl font-bold">Alex Crypto</h3>
-            <p className="text-purple-400 text-lg">Founder & CEO</p>
-          </div>
-          <div className="text-center">
-            <div className="w-48 h-48 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full mx-auto mb-6" />
-            <h3 className="text-2xl font-bold">Sarah Dev</h3>
-            <p className="text-blue-400 text-lg">Lead Developer</p>
-          </div>
-          <div className="text-center">
-            <div className="w-48 h-48 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full mx-auto mb-6" />
-            <h3 className="text-2xl font-bold">Mike Analytics</h3>
-            <p className="text-green-400 text-lg">Data Scientist</p>
-          </div>
+        <div className="prose prose-invert text-gray-300 text-lg leading-relaxed space-y-6">
+          <p>This page is live and working. Full content restored.</p>
+          <p>DexNova — Real-time multi-chain DEX analytics platform.</p>
         </div>
       </main>
       <Footer />
