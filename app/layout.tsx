@@ -4,8 +4,6 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/CookieBanner';
 
-export const metadata = { title: 'DexNova — Live Multi-Chain Tracker' };
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -14,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Sidebar />
           <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
             <Header />
-            <main className="flex-1 pt-20">{children}</main>
+            <main className="flex-1">{children}</main>
             <Footer />
             <CookieBanner />
           </div>
