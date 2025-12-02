@@ -11,20 +11,24 @@ export default function Home() {
       try {
         const res = await fetch('https://api.geckoterminal.com/api/v2/networks/solana/trending_pools');
         const data = await res.json();
-        
+
         if (data?.data?.length > 0) {
           const liveTokens = data.data.slice(0, 20).map((p: any) => {
             const a = p.attributes;
             return {
               id: p.id,
-              name: a.name.split(' / ')[0] || 'Unknown',
+              name: a.name?.split(' / ')[0] || 'Unknown',
               symbol: a.base_token_symbol || '???',
               price: a.base_token_price_usd ? `$${Number(a.base_token_price_usd).toFixed(8)}` : 'N/A',
-              change24h: a.price_change_percentage?.h24 ? 
-                (a.price_change_percentage.h24 > 0 ? '+' : '') + a.price_change_percentage.h24.toFixed(2) + '%' 
+              change24h: a.price_change_percentage?.h24 
+                ? (a.price_change_percentage.h24 > 0 ? '+' : '') + a.price_change_percentage.h24.toFixed(2) + '%'
                 : '0%',
-              volume24h: a.volume_usd?.h24 ? '$' + (a.volume_usd.h24 /  / 1000000).toFixed(2) + 'M' : '$0',
-              liquidity: a.reserve_in_usd ? '$' + (a.reserve_in_usd / 1000000).toFixed(2) + 'M' : '$0',
+              volume24h: a.volume_usd?.h24 
+                ? '$' + (a.volume_usd.h24 / 1000000).toFixed(2) + 'M' 
+                : '$0',
+              liquidity: a.reserve_in_usd 
+                ? '$' + (a.reserve_in_usd / 1000000).toFixed(2) + 'M' 
+                : '$0',
               logo: a.base_token?.icon_url || 'https://via.placeholder.com/64',
               chain: 'Solana',
             };
