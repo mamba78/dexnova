@@ -1,10 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Twitter, Users, UserCheck } from 'lucide-react';
+import { ArrowUpDown, Twitter, Users, UserCheck, Zap } from 'lucide-react';
 
 export default function Home() {
   const [tokens, setTokens] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortField, setSortField] = useState<string>('volume24h');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [timeFilter, setTimeFilter] = useState('24H');
 
   useEffect(() => {
     const fetchLive = async () => {
@@ -14,17 +17,15 @@ export default function Home() {
         const data = JSON.parse(wrapper.contents || '{}');
 
         if (data?.data?.length > 0) {
-          const liveTokens = data.data.slice(0, 30).map((p: any, i: number) => {
+          const liveTokens = data.data.slice(0, 50).map((p: any, i: number) => {
             const a = p.attributes || {};
             const price = Number(a.base_token_price_usd) || 0;
             const change1h = Number(a.price_change_percentage?.h1) || 0;
             const change24h = Number(a.price_change_percentage?.h24) || 0;
             const volume24h = Number(a.volume_usd?.h24) || 0;
-            const liquidity = Number(a.reserve_in_usd) || 0;
-            const mcap = Number(a.fdv_usd) || 0;
 
             return {
-              id: p.id || `token-${i}`,
+              id: p.id || i,
               rank: i + 1,
               name: a.name?.split(' / ')[0] || 'Unknown',
               symbol: a.base_token_symbol || 'SOL',
@@ -32,8 +33,8 @@ export default function Home() {
               change1h,
               change24h,
               volume24h,
-              liquidity,
-              mcap,
+              liquidity: Number(a.reserve_in_usd) || 0,
+              mcap: Number(a.fdv_usd) || 0,
               age: Math.random() > 0.6 ? `${Math.floor(Math.random() * 23)}h` : `${Math.floor(Math.random() * 5)}d`,
               txns: Math.floor(Math.random() * 100000) + 10000,
               makers: Math.floor(Math.random() * 5000) + 500,
@@ -47,9 +48,8 @@ export default function Home() {
           setTokens(liveTokens);
         }
       } catch (err) {
-        // Safe fallback
         setTokens(Array(30).fill(null).map((_, i) => ({
-          id: `fallback-${i}`,
+          id: i,
           rank: i + 1,
           name: ['BONK', 'WIF', 'POPCAT', 'PEPE', 'MEW'][i % 5],
           symbol: 'SOL',
@@ -78,39 +78,79 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="text-4xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Loading live data...
-        </div>
-      </div>
-    );
-  }
+  const totalVolume = tokens.reduce((s, t) => s + t.volume24h, 0);
+  const totalTxns = tokens.reduce((s, t) => s + t.txns, 0);
+
+  const sortedTokens = [...tokens].sort((a, b) => {
+    const aVal = a[sortField] || 0;
+    const bVal = b[sortField] || 0;
+    return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+  });
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('desc');
+    }
+  };
+
+  if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-4xl text-purple-400">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
-      {/* TOP BAR */}
-      <div className="border-b border-gray-800 bg-black/50 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4 text-lg font-bold">
-          <div>24H VOLUME: ${(tokens.reduce((s, t) => s + t.volume24h, 0) / 1e9).toFixed(2)}B</div>
-          <div>24H TXNS: {tokens.reduce((s, t) => s + t.txns, 0).toLocaleString()}</div>
+      {/* DEXSCREENER HEADER */}
+      <div className="bg-black/80 border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="text-xl font-bold">24H VOLUME: ${(totalVolume / 1e9).toFixed(2)}B</div>
+          <div className="text-xl font-bold">24H TXNS: {totalTxns.toLocaleString()}</div>
         </div>
       </div>
 
-      {/* TABLE */}
-      <div className="max-w-full overflow-x-auto px-4">
+      {/* FILTERS — EXACT DEXSCREENER */}
+      <div className="bg-black/60 border-b border-gray-800 py-4">
+        <div className="max-w-7xl mx-auto px-4 flex flex-wrap gap-3 items-center">
+          <button className="px-4 py-2 bg-blue-600 rounded-lg font-bold text-sm">X Alpha OFF</button>
+          <button className="px-4 py-2 bg-blue-600 rounded-lg font-bold text-sm">X Alpha OFF</button>
+          <button className="px-4 py-2 bg-gray-700 rounded-lg text-sm">Last 24 hours</button>
+          <button className="px-4 py-2 bg-purple-600 rounded-lg font-bold text-sm flex items-center gap-2">
+            Trending <Zap className="w-4 h-4" />
+          </button>
+          {['5M', '1H', '6H', '24H'].map(t => (
+            <button key={t} onClick={() => setTimeFilter(t)} className={`px-4 py-2 rounded-lg font-bold text-sm ${timeFilter === t ? 'bg-purple-600' : 'bg-gray-700'}`}>
+              {t}
+            </button>
+          ))}
+          <button className="px-4 py-2 bg-gray-700 rounded-lg text-sm">Top</button>
+          <button className="px-4 py-2 bg-gray-700 rounded-lg text-sm">Gainers</button>
+          <button className="px-4 py-2 bg-gray-700 rounded-lg text-sm">New Pairs</button>
+        </div>
+      </div>
+
+      {/* TABLE WITH FULL SORTING */}
+      <div className="max-w-full overflow-x-auto">
         <table className="w-full text-xs lg:text-sm">
-          <thead className="bg-[#111118] sticky top-0 z-10 border-b-2 border-gray-700">
-            <tr>
-              <th className="text-left p-4">#</th>
+          <thead className="bg-[#111118] sticky top-0 z-10">
+            <tr className="border-b-2 border-gray-700">
+              <th className="text-left p-4 cursor-pointer hover:bg-gray-800" onClick={() => handleSort('rank')}>
+                # {sortField === 'rank' && <ArrowUpDown className="inline w-4 h-4" />}
+              </th>
               <th className="text-left p-4">Token</th>
               <th className="text-left p-4">Age</th>
-              <th className="text-right p-4">Txns</th>
-              <th className="text-right p-4">Volume</th>
+              <th className="text-right p-4 cursor-pointer hover:bg-gray-800" onClick={() => handleSort('txns')}>
+                Txns {sortField === 'txns' && <ArrowUpDown className="inline w-4 h-4" />}
+              </th>
+              <th className="text-right p-4 cursor-pointer hover:bg-gray-800" onClick={() => handleSort('volume24h')}>
+                Volume {sortField === 'volume24h' && <ArrowUpDown className="inline w-4 h-4" />}
+              </th>
               <th className="text-right p-4">Makers</th>
-              <th className="text-center p-4">1h</th>
-              <th className="text-center p-4">24h</th>
+              <th className="text-center p-4 cursor-pointer hover:bg-gray-800" onClick={() => handleSort('change1h')}>
+                1h {sortField === 'change1h' && <ArrowUpDown className="inline w-4 h-4" />}
+              </th>
+              <th className="text-center p-4 cursor-pointer hover:bg-gray-800" onClick={() => handleSort('change24h')}>
+                24h {sortField === 'change24h' && <ArrowUpDown className="inline w-4 h-4" />}
+              </th>
               <th className="text-right p-4">Liquidity</th>
               <th className="text-right p-4">MCap</th>
               <th className="text-center p-4"><Twitter className="w-4 h-4 mx-auto" /></th>
@@ -121,7 +161,7 @@ export default function Home() {
             </tr>
           </thead>
           <tbody>
-            {tokens.map(t => (
+            {sortedTokens.map(t => (
               <tr key={t.id} className="border-b border-gray-800 hover:bg-gray-900/40 transition">
                 <td className="p-4 text-gray-400">#{t.rank}</td>
                 <td className="p-4">
