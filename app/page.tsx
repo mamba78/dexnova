@@ -5,7 +5,7 @@ import { Grid3x3, Table, ArrowUpDown, Twitter, Users, UserCheck } from 'lucide-r
 export default function Home() {
   const [tokens, setTokens] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
+  const [viewMode] = useState<'table'>('table');
   const [sortField, setSortField] = useState<string>('rank');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
@@ -14,17 +14,17 @@ export default function Home() {
       try {
         const res = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://api.geckoterminal.com/api/v2/networks/solana/trending_pools'));
         const wrapper = await res.json();
-        const data = JSON.parse(wrapper.contents);
+        const data = JSON.parse(wrapper.contents || '{}');
 
         if (data?.data?.length > 0) {
           const liveTokens = data.data.slice(0, 50).map((p: any, i: number) => {
-            const a = p.attributes;
+            const a = p.attributes || {};
             return {
-              id: p.id,
+              id: p.id || `token-${i}`,
               rank: i + 1,
-              name: a.name?.split(' / ')[0] || 'Unknown',
-              symbol: a.base_token_symbol || 'SOL',
-              price: a.base_token_price_usd ? Number(a.base_token_price_usd).toFixed(8) : 0,
+              name: a.name?.split(' / ')[0] || 'Unknown Token',
+              symbol: a.base_token_symbol || '???',
+              price: a.base_token_price_usd ? Number(a.base_token_price_usd) : 0,
               change1h: a.price_change_percentage?.h1 || 0,
               change24h: a.price_change_percentage?.h24 || 0,
               volume24h: a.volume_usd?.h24 || 0,
@@ -36,16 +36,16 @@ export default function Home() {
               tweets: Math.random() > 0.5 ? Math.floor(Math.random() * 200) : 0,
               kols: Math.random() > 0.6 ? Math.floor(Math.random() * 50) : 0,
               accounts: Math.random() > 0.7 ? Math.floor(Math.random() * 100) : 0,
-              logo: a.base_token?.icon_url || 'https://via.placeholder.com/64',
+              logo: a.base_token?.icon_url || '/placeholder.png',
               safe: Math.random() > 0.3,
             };
           });
           setTokens(liveTokens);
         }
       } catch (err) {
-        // Fallback data
-        setTokens(Array(50).fill(null).map((_, i) => ({
-          id: i,
+        // Safe fallback
+        setTokens(Array(30).fill(null).map((_, i) => ({
+          id: `fallback-${i}`,
           rank: i + 1,
           name: ['BONK', 'WIF', 'POPCAT', 'PEPE', 'MEW'][i % 5],
           symbol: 'SOL',
@@ -61,8 +61,8 @@ export default function Home() {
           tweets: Math.random() > 0.5 ? Math.floor(Math.random() * 150) : 0,
           kols: Math.random() > 0.6 ? Math.floor(Math.random() * 30) : 0,
           accounts: Math.random() > 0.7 ? Math.floor(Math.random() * 80) : 0,
-          logo: 'https://assets.coingecko.com/coins/images/28600/small/bonk.png',
-          safe: Math.random() > 0.3,
+          logo: '/placeholder.png',
+          safe: true,
         })));
       } finally {
         setLoading(false);
@@ -70,19 +70,17 @@ export default function Home() {
     };
 
     fetchLive();
-    const interval = setInterval(fetchLive, 15000);
+    const interval = setInterval(fetchLive, 20000);
     return () => clearInterval(interval);
   }, []);
 
-  const totalVolume = tokens.reduce((sum, t) => sum + t.volume24h, 0);
-  const totalTxns = tokens.reduce((sum, t) => sum + t.txns, 0);
+  const totalVolume = tokens.reduce((sum, t) => sum + (t.volume24h || 0), 0);
+  const totalTxns = tokens.reduce((sum, t) => sum + (t.txns || 0), 0);
 
   const sortedTokens = [...tokens].sort((a, b) => {
-    if (sortField === 'rank') return sortDir === 'asc' ? a.rank - b.rank : b.rank - a.rank;
-    if (sortField === 'price') return sortDir === 'asc' ? a.price - b.price : b.price - a.price;
-    if (sortField === 'change24h') return sortDir === 'asc' ? a.change24h - b.change24h : b.change24h - a.change24h;
-    if (sortField === 'volume24h') return sortDir === 'asc' ? a.volume24h - b.volume24h : b.volume24h - a.volume24h;
-    return 0;
+    const aVal = a[sortField] || 0;
+    const bVal = b[sortField] || 0;
+    return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
   });
 
   const handleSort = (field: string) => {
@@ -94,39 +92,39 @@ export default function Home() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="text-4xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          Loading live data...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
-      {/* TOP BAR — EXACT DEXSCREENER */}
+      {/* TOP BAR */}
       <div className="border-b border-gray-800 bg-black/50 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-center md:text-left">
-            <div className="text-lg font-bold">24H VOLUME: ${(totalVolume / 1e9).toFixed(1)}B</div>
-          </div>
-          <div className="text-center md:text-right">
-            <div className="text-lg font-bold">24H TXNS: {totalTxns.toLocaleString()}</div>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4 text-lg font-bold">
+          <div>24H VOLUME: ${(totalVolume / 1e9).toFixed(2)}B</div>
+          <div>24H TXNS: {totalTxns.toLocaleString()}</div>
         </div>
       </div>
 
-      {/* FILTERS — EXACT DEXSCREENER */}
-      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-wrap gap-3 items-center justify-center">
-        <button className="px-4 py-2 bg-blue-600 rounded-lg font-bold">X Alpha OFF</button>
+      {/* FILTERS */}
+      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-wrap gap-3 justify-center">
         <button className="px-4 py-2 bg-blue-600 rounded-lg font-bold">X Alpha OFF</button>
         <button className="px-4 py-2 bg-gray-700 rounded-lg">Last 24 hours</button>
         <button className="px-4 py-2 bg-purple-600 rounded-lg font-bold">Trending</button>
-        <div className="flex gap-1">
-          {['5M', '1H', '6H', '24H'].map(t => (
-            <button key={t} className={`px-4 py-2 rounded-lg font-bold ${t === '24H' ? 'bg-purple-600' : 'bg-gray-700'}`}>
-              {t}
-            </button>
-          ))}
-        </div>
-        <button className="px-4 py-2 bg-gray-700 rounded-lg">Top</button>
-        <button className="px-4 py-2 bg-gray-700 rounded-lg">Gainers</button>
-        <button className="px-4 py-2 bg-gray-700 rounded-lg">New Pairs</button>
+        {['5M', '1H', '6H', '24H'].map(t => (
+          <button key={t} className={`px-4 py-2 rounded-lg font-bold ${t === '24H' ? 'bg-purple-600' : 'bg-gray-700'}`}>
+            {t}
+          </button>
+        ))}
       </div>
 
-      {/* TABLE WITH SORTING */}
+      {/* TABLE */}
       <div className="max-w-full overflow-x-auto px-4">
         <table className="w-full text-xs lg:text-sm">
           <thead className="bg-[#111118] sticky top-0 z-10 border-b-2 border-gray-700">
@@ -134,11 +132,11 @@ export default function Home() {
               <th onClick={() => handleSort('rank')} className="text-left p-4 cursor-pointer hover:bg-gray-800">#</th>
               <th className="text-left p-4">Token</th>
               <th className="text-left p-4">Age</th>
-              <th onClick={() => handleSort('txns')} className="text-right p-4 cursor-pointer hover:bg-gray-800">Txns <ArrowUpDown className="inline w-4 h-4" /></th>
-              <th onClick={() => handleSort('volume24h')} className="text-right p-4 cursor-pointer hover:bg-gray-800">Volume <ArrowUpDown className="inline w-4 h-4" /></th>
+              <th onClick={() => handleSort('txns')} className="text-right p-4 cursor-pointer hover:bg-gray-800">Txns</th>
+              <th onClick={() => handleSort('volume24h')} className="text-right p-4 cursor-pointer hover:bg-gray-800">Volume</th>
               <th className="text-right p-4">Makers</th>
-              <th onClick={() => handleSort('change1h')} className="text-center p-4 cursor-pointer hover:bg-gray-800">1h <ArrowUpDown className="inline w-4 h-4" /></th>
-              <th onClick={() => handleSort('change24h')} className="text-center p-4 cursor-pointer hover:bg-gray-800">24h <ArrowUpDown className="inline w-4 h-4" /></th>
+              <th onClick={() => handleSort('change1h')} className="text-center p-4 cursor-pointer hover:bg-gray-800">1h</th>
+              <th onClick={() => handleSort('change24h')} className="text-center p-4 cursor-pointer hover:bg-gray-800">24h</th>
               <th className="text-right p-4">Liquidity</th>
               <th className="text-right p-4">MCap</th>
               <th className="text-center p-4"><Twitter className="w-4 h-4 mx-auto" /></th>
@@ -154,7 +152,7 @@ export default function Home() {
                 <td className="p-4 text-gray-400">#{t.rank}</td>
                 <td className="p-4">
                   <div className="flex items-center gap-3">
-                    <img src={t.logo} className="w-8 h-8 rounded-full" />
+                    <div className="w-8 h-8 bg-gray-700 rounded-full" />
                     <div>
                       <div className="font-bold">{t.name}</div>
                       <div className="text-xs text-gray-500">{t.symbol}/SOL</div>
@@ -162,9 +160,9 @@ export default function Home() {
                   </div>
                 </td>
                 <td className="p-4 text-gray-400">{t.age}</td>
-                <td className="p-4 text-right">{t.txns.toLocaleString()}</td>
+                <td className="p-4 text-right">{t.txns?.toLocaleString() || '0'}</td>
                 <td className="p-4 text-right text-green-400 font-bold">${(t.volume24h / 1000000).toFixed(1)}M</td>
-                <td className="p-4 text-right">{t.makers.toLocaleString()}</td>
+                <td className="p-4 text-right">{t.makers?.toLocaleString() || '0'}</td>
                 <td className={`p-4 text-center font-bold ${t.change1h > 0 ? 'text-green-400' : 'text-red-400'}`}>
                   {t.change1h > 0 ? '+' : ''}{t.change1h.toFixed(1)}%
                 </td>
