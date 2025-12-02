@@ -21,7 +21,7 @@ export default function Home() {
             const txns = Math.floor(Math.random() * 100000) + 10000;
             const makers = Math.floor(Math.random() * 5000) + 500;
             const tweets = Math.random() > 0.7 ? Math.floor(Math.random() * 100) : '-';
-            
+
             return {
               id: p.id,
               rank: i + 1,
@@ -44,11 +44,11 @@ export default function Home() {
           setTokens(liveTokens);
         }
       } catch (err) {
-        // Fallback data if API blocked
+        // Fallback data
         setTokens(Array(30).fill(null).map((_, i) => ({
           id: i,
           rank: i + 1,
-          name: ['BONK', 'WIF', 'POPCAT', 'BULLISH'][i % 4],
+          name: ['BONK', 'WIF', 'POPCAT', 'BULLISH', 'GREEN'][i % 5],
           symbol: 'SOL',
           price: '$0.0000' + (Math.random() * 9999).toFixed(4),
           change1h: (Math.random() * 200 - 100).toFixed(2) + '%',
@@ -75,30 +75,29 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black pt-20 px-4">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <h1 className="text-5xl md:text-7xl font-black text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Hot Pairs • Live
-        </h1>
-        <div className="flex justify-center gap-4 mt-8">
-          <button 
-            onClick={() => setViewMode('grid')}
-            className={`px-6 py-3 rounded-l-xl font-bold ${viewMode === 'grid' ? 'bg-purple-600' : 'bg-gray-800'}`}
-          >
-            <Grid3x3 className="w-5 h-5 inline mr-2" /> Grid
-          </button>
-          <button 
-            onClick={() => setViewMode('table')}
-            className={`px-6 py-3 rounded-r-xl font-bold ${viewMode === 'table' ? 'bg-purple-600' : 'bg-gray-800'}`}
-          >
-            <Table className="w-5 h-5 inline mr-2" /> Table
-          </button>
-        </div>
+      <h1 className="text-5xl md:text-7xl font-black text-center mb-12 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        Hot Pairs • Live
+      </h1>
+
+      {/* VIEW TOGGLE */}
+      <div className="max-w-7xl mx-auto flex justify-center gap-4 mb-8">
+        <button
+          onClick={() => setViewMode('grid')}
+          className={`flex items-center gap-2 px-6 py-3 rounded-l-xl font-bold transition ${viewMode === 'grid' ? 'bg-purple-600' : 'bg-gray-800'}`}
+        >
+          <Grid3x3 className="w-5 h-5" /> Grid
+        </button>
+        <button
+          onClick={() => setViewMode('table')}
+          className={`flex items-center gap-2 px-6 py-3 rounded-r-xl font-bold transition ${viewMode === 'table' ? 'bg-purple-600' : 'bg-gray-800'}`}
+        >
+          <Table className="w-5 h-5" /> Table
+        </button>
       </div>
 
       {/* GRID VIEW */}
       {viewMode === 'grid' && !loading && (
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-cols-4 2xl:grid-cols-5 gap-6">
           {tokens.map(t => (
             <div key={t.id} className="bg-gray-900/60 border border-gray-800 rounded-xl p-5 hover:border-purple-500 transition">
               <div className="flex items-center gap-3 mb-4">
@@ -110,7 +109,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="text-2xl font-black mb-3">{t.price}</div>
-              <div className={`${t.change24h.startsWith('+') ? 'text-green-400' : 'text-red-400'} font-bold mb-4`}>
+              <div className={`text-xl font-bold mb-4 ${t.change24h.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
                 {t.change24h}
               </div>
               <div className="text-xs text-gray-400 space-y-1">
@@ -126,8 +125,7 @@ export default function Home() {
       {viewMode === 'table' && !loading && (
         <div className="max-w-full overflow-x-auto">
           <table className="w-full text-xs md:text-sm">
-            <thead className="bg-gray-900/80 border-b border-gray-700">
-              sticky top-0">
+            <thead className="bg-gray-900/80 border-b border-gray-700 sticky top-0">
               <tr>
                 <th className="text-left p-4">#</th>
                 <th className="text-left p-4">Token</th>
@@ -140,7 +138,6 @@ export default function Home() {
                 <th className="text-right p-4">Liquidity</th>
                 <th className="text-right p-4">MCap</th>
                 <th className="text-center p-4">Safe</th>
-                <th className="text-center p-4">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -160,17 +157,18 @@ export default function Home() {
                   <td className="p-4 text-right">{t.txns.toLocaleString()}</td>
                   <td className="p-4 text-right text-green-400 font-bold">{t.volume24h}</td>
                   <td className="p-4 text-right">{t.makers.toLocaleString()}</td>
-                  <td className="p-4 text-center ${t.change1h.startsWith('+') ? 'text-green-400' : 'text-red-400'} font-bold">{t.change1h}</td>
-                  <td className="p-4 text-center ${t.change24h.startsWith('+') ? 'text-green-400' : 'text-red-400'} font-bold">{t.change24h}</td>
+                  <td className={`p-4 text-center font-bold ${t.change1h.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
+                    {t.change1h}
+                  </td>
+                  <td className={`p-4 text-center font-bold ${t.change24h.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
+                    {t.change24h}
+                  </td>
                   <td className="p-4 text-right">{t.liquidity}</td>
                   <td className="p-4 text-right">{t.mcap}</td>
                   <td className="p-4 text-center">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${t.safe === 'Yes' ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
                       {t.safe}
                     </span>
-                  </td>
-                  <td className="p-4 text-center">
-                    <button className="text-blue-400 hover:text-blue-300">Trade</button>
                   </td>
                 </tr>
               ))}
