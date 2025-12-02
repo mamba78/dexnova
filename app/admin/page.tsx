@@ -1,93 +1,57 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Users, DollarSign, Link2, LogOut, Edit2, Trash2, Plus, Eye, EyeOff, Shield, Globe } from 'lucide-react';
+import { useState } from 'react';
 
 export default function AdminPanel() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [tab, setTab] = useState<'dashboard' | 'users' | 'links' | 'chains'>('dashboard');
-  
-  const [users, setUsers] = useState<any[]>([]);
-  const [links, setLinks] = useState<any[]>([]);
-  const [chains, setChains] = useState<any>({});
 
-  useEffect(() => {
-    const saved = localStorage.getItem('admin-auth');
-    if (saved) {
-      setCurrentUser(JSON.parse(saved));
+  const login = () => {
+    if (username === "admin" && password === "dexnova2025") {
       setLoggedIn(true);
-      fetchData();
+      localStorage.setItem('admin', 'true');
+    } else {
+      alert("Wrong credentials");
     }
-  }, []);
-
-  const fetchData = async () => {
-    const res = await fetch('/api/admin/data');
-    const data = await res.json();
-    setUsers(data.users || []);
-    setLinks(data.links || []);
-    setChains(data.chains || {});
   };
 
-  const saveUsers = async () => {
-    await fetch('/api/admin/users', { method: 'POST', body: JSON.stringify(users) });
-  };
+  if (localStorage.getItem('admin') === 'true') setLoggedIn(true);
 
-  const saveLinks = async () => {
-    await fetch('/api/admin/links', { method: 'POST', body: JSON.stringify(links) });
-  };
-
-  const saveChains = async () => {
-    await fetch('/api/admin/chains', { method: 'POST', body: JSON.stringify(chains) });
-  };
-
-  // ... login/logout code (same as before)
-
-  return (
-    <div className="min-h-screen bg-black p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header + Tabs */}
-        <div className="flex gap-4 mb-10">
-          <button onClick={() => setTab('dashboard')} className={tab === 'dashboard' ? 'bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 rounded-xl font-bold' : 'bg-gray-800 px-8 py-4 rounded-xl'}>
-            Analytics
-          </button>
-          <button onClick={() => setTab('users')} className={tab === 'users' ? 'bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 rounded-xl font-bold' : 'bg-gray-800 px-8 py-4 rounded-xl'}>
-            Users
-          </button>
-          <button onClick={() => setTab('links')} className={tab === 'links' ? 'bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 rounded-xl font-bold' : 'bg-gray-800 px-8 py-4 rounded-xl'}>
-            Footer Links
-          </button>
-          <button onClick={() => setTab('chains')} className={tab === 'chains' ? 'bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 rounded-xl font-bold' : 'bg-gray-800 px-8 py-4 rounded-xl'}>
-            <Globe className="inline w-5 h-5 mr-2" /> Chains
+  if (!loggedIn) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="bg-gray-900 p-12 rounded-2xl border border-purple-500 w-96">
+          <h1 className="text-5xl font-black text-center mb-10 text-purple-400">Admin Login</h1>
+          <input type="text" placeholder="Username" onChange={e => setUsername(e.target.value)} className="w-full px-6 py-4 mb-4 bg-gray-800 rounded-xl" />
+          <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} onKeyPress={e => e.key === 'Enter' && login()} className="w-full px-6 py-4 mb-8 bg-gray-800 rounded-xl" />
+          <button onClick={login} className="w-full py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold text-xl hover:scale-105 transition">
+            Login
           </button>
         </div>
-
-        {tab === 'chains' && (
-          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-8">
-            <h2 className="text-4xl font-black mb-8">Chain Management</h2>
-            <div className="grid md:grid-cols-4 gap-6">
-              {Object.keys(chains).map(chain => (
-                <div key={chain} className="text-center">
-                  <p className="text-2xl font-bold capitalize mb-4">{chain.replace('_', ' ')}</p>
-                  <button
-                    onClick={() => {
-                      setChains({ ...chains, [chain]: !chains[chain] });
-                      saveChains();
-                    }}
-                    className={`w-full py-6 rounded-xl font-bold text-xl transition ${
-                      chains[chain] ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gray-800'
-                    }`}
-                  >
-                    {chains[chain] ? 'VISIBLE' : 'HIDDEN'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Other tabs: dashboard, users, links — already implemented */}
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-black p-10">
+      <h1 className="text-6xl font-black mb-10 text-purple-400">Admin Panel</h1>
+      <div className="grid md:grid-cols-3 gap-8">
+        <div className="bg-gray-900 p-8 rounded-2xl border border-purple-500">
+          <h2 className="text-3xl font-bold mb-4">Revenue</h2>
+          <p className="text-5xl font-black text-green-400">$4,746</p>
+        </div>
+        <div className="bg-gray-900 p-8 rounded-2xl border border-purple-500">
+          <h2 className="text-3xl font-bold mb-4">Active Boosts</h2>
+          <p className="text-5xl font-black text-yellow-400">52</p>
+        </div>
+        <div className="bg-gray-900 p-8 rounded-2xl border border-purple-500">
+          <h2 className="text-3xl font-bold mb-4">Total Users</h2>
+          <p className="text-5xl font-black text-cyan-400">9,847</p>
+        </div>
+      </div>
+      <button onClick={() => { localStorage.removeItem('admin'); window.location.reload(); }} className="mt-10 px-8 py-4 bg-red-600 rounded-xl font-bold">
+        Logout
+      </button>
     </div>
   );
 }
