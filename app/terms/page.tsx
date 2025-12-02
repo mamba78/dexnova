@@ -10,7 +10,7 @@ export default function Page() {
           DexNova — Terms
         </h1>
         <p className="text-lg text-gray-300 leading-relaxed">
-          This page is live and working. Full content coming soon.
+          This page is live. Full content: Coming soon.
         </p>
       </main>
       <Footer />
