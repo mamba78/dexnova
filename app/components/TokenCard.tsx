@@ -31,13 +31,16 @@ export default function TokenCard({ token, index }: { token: any; index: number 
 
   const isBoosted = !!localStorage.getItem(`boosted-${token.id}`);
 
+  const handleBoosted = () => {
+    window.location.reload(); // Refresh to update boost status
+  };
+
   return (
     <>
       <div 
         className={`relative bg-gray-900/60 border rounded-xl p-6 transition-all duration-300 hover:scale-[1.03] cursor-pointer
           ${isBoosted ? 'border-yellow-500 shadow-2xl shadow-yellow-500/30 ring-2 ring-yellow-500/50' : 'border-gray-800'}`}
       >
-        {/* BOOST BADGE + TIMER */}
         {isBoosted && (
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
             <div className="bg-gradient-to-r from-yellow-400 to-amber-600 text-black px-5 py-2 rounded-full font-bold text-sm shadow-xl flex items-center gap-2 animate-pulse">
@@ -76,13 +79,19 @@ export default function TokenCard({ token, index }: { token: any; index: number 
         </div>
 
         <Link href={`/token/${token.id}`}>
-          <button className="w-full mt-6 py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold hover:scale-105 transition">
+          <button className="w-full mt-6 py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl font-bold hover:scale-105 transition shadow-lg">
             View Token
           </button>
         </Link>
       </div>
 
-      {showBoost && <BoostModal token={token} onClose={() => setShowBoost(false)} />}
+      {showBoost && (
+        <BoostModal 
+          token={token} 
+          onClose={() => setShowBoost(false)} 
+          onBoosted={handleBoosted}
+        />
+      )}
     </>
   );
 }
